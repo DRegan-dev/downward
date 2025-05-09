@@ -1,0 +1,23 @@
+/* Modern CSS Reset */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+img, picture, video, canvas, svg {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+input, button, textarea, select {
+    font: inherit;
+}
