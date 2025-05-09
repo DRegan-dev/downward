@@ -31,6 +31,28 @@
             </ul>
         </nav>
      </header>
+
+     <!-- Main Content Area -->
+
+     <main class="site-content">
+        {% block content %}
+        {% endblock %}
+     </main>
+
+     <!--Footer-->
+     <footer class="site-footer">
+        <div class="footer-content">
+            <p>&copy; {% now "Y" %} Downward. A space for descent.</p>
+            <nav class="footer-links">
+                <a href="{% url 'about' %}">About</a>
+                <a href="{% url 'privacy' %}">Privacy</a>
+                <a href="{% url 'terms' %}">Terms</a>
+            </nav>
+        </div>
+     </footer>
+
+     <!-- Javascript -->
+      <script src="{% static '/js/main.js' %}" ></script>
     
 </body>
 </html>
