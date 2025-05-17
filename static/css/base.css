@@ -27,6 +27,9 @@ body {
 .site-content {
     flex-grow: 1;
     padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
 
 }
 
@@ -121,7 +124,88 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--color-text-secondary);
 }
 
+/* Homepage Styles */
+.homepage-container {
+    text-align: center;
+    padding: 4rem 2rem;
+    min-height: 88vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
 
+.homepage-title {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    font-family: var(--font-primary);
+}
+
+.tagline {
+    font-size: 1.5rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 2rem;
+}
+
+.introduction-text {
+    max-width: 600px;
+    margin: 2rem auto;
+    line-height: 1.6;
+}
+
+.introduction-text p {
+    margin-bottom: 1rem;
+}
+
+.cta-button {
+    display: inline-block;
+    padding: 1rem 2rem;
+    background-color: var(--color-accent);
+    color: var(--color-text-primary);
+    text-decoration: none;
+    border-radius: 4px;
+    font-family: var(--font-primary);
+    font-size: 1.1rem;
+    transition: all 0.3 ease;
+    margin-top: 2rem;
+}
+
+.cta-button:hover {
+    background-color: var(--color-hover);
+    transform: translateY(-2px);
+}
+
+.footer-content {
+    text-align: center;
+    padding: 2rem;
+}
+
+.footer-links {
+    margin-top: 1rem;
+}
+
+.footer-links {
+    margin-top: 1rem;
+}
+
+.footer-links a {
+    color: var(--color-text-primary);
+    text-decoration: none;
+    margin: 0 1rem;
+    transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: var(--color-text-secondary);
+}
+
+.nav-links li a {
+    {% if user.is_authenticated %}
+        color: var(--color-text-primary);
+    {% else %}
+        color: var(--color-text-secondary);
+    {% endif %}
+}
 
 @media (max-width: 768px) {
     html {
