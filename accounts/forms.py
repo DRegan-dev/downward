@@ -20,4 +20,11 @@ class UserRegistrationForm(UserCreationForm):
                 'placeholder': f'Enter your {field.label.lower()}'
             })
 
-    
+class UserLoginForm(AuthenticationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs):
+        for field in self.fields.values():
+            field.widget.attrs.update({
+                'class': 'form-input',
+                'placeholder': f'Enter your {field.label.lower()}'
+            })
