@@ -3,10 +3,13 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 
 class UserRegistrationForm(UserCreationForm):
-    email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={
-        'class': 'form-input',
-        'placeholder': 'Enter your email'
-    }))
+    email = forms.EmailField(
+        required=True, 
+        widget=forms.EmailInput(attrs={
+            'class': 'form-input',
+            'placeholder': 'Enter your Email'
+        })
+    )
 
     class Meta:
         model = User
@@ -14,17 +17,27 @@ class UserRegistrationForm(UserCreationForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.widget.attrs.update({
-                'class': "form_input",
-                'placeholder': f'Enter your {field.label.lower()}'
-            })
+        self.fields['username'].widget.attrs.update({
+            'class': "form_input",
+            'placeholder': 'Enter your Username'
+        })
+        self.fields['password1'].widget.attrs.update({
+            'class': "form_input",
+            'placeholder': 'Enter your Password'
+        })
+        self.fields['username'].widget.attrs.update({
+            'class': "form_input",
+            'placeholder': 'Enter your Password'
+        })
 
 class UserLoginForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs):
-        for field in self.fields.values():
-            field.widget.attrs.update({
-                'class': 'form-input',
-                'placeholder': f'Enter your {field.label.lower()}'
-            })
+        self.fields['username'].widget.attrs.update({
+            'class': 'form-input',
+            'placeholder': 'Enter your Username'
+        })
+        self.fields['password'].widget.attrs.update({
+            'class': 'form-input',
+            'placeholder': 'Enter your Password'
+        })
