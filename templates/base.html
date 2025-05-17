@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,12 +23,12 @@
             </div>
             <ul class="nav-links">
                 {% if user.is_athenticated %}
-                    <li><a href="{% url 'start_descent' %}">New Descent</a></li>
-                    <li><a href="{% url 'journal_history' %}">My Journeys</a></li>
-                    <li><a href="{% url 'logout' %}">Logout</a></li>
+                    <li><a href="#">New Descent</a></li>
+                    <li><a href="#">My Journeys</a></li>
+                    <li><a href="#">Logout</a></li>
                 {% else %}
-                    <li><a href="{% url 'login' %}">Login</a></li>
-                    <li><a href="{% url 'register' %}">Register</a></li>
+                    <li><a href="#">Login</a></li>
+                    <li><a href="#">Register</a></li>
                 {% endif %}
             </ul>
         </nav>
@@ -44,9 +46,9 @@
         <div class="footer-content">
             <p>&copy; {% now "Y" %} Downward. A space for descent.</p>
             <nav class="footer-links">
-                <a href="{% url 'about' %}">About</a>
-                <a href="{% url 'privacy' %}">Privacy</a>
-                <a href="{% url 'terms' %}">Terms</a>
+                <a href="#">About</a>
+                <a href="#">Privacy</a>
+                <a href="#">Terms</a>
             </nav>
         </div>
      </footer>
