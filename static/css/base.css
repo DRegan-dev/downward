@@ -245,11 +245,98 @@ h1, h2, h3, h4, h5, h6 {
 .about-container {
     max-width: 800px;
     margin: 0 auto;
-    padding 2rem
+    padding: 2rem;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    color: var(--color-text-primary)
+}
+
+.section-subtitle {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    color: var(--color-text-secondary)
+}
+
+/* Values Section */
+.values-section {
+    margin-bottom: 3rem;
+}
+
+.values-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.value-card {
+    background-color: var(--color-accent);
+    padding:  1.5rem;
+    border-radius: 8px;
+    text-align: center;
+    transition: transform 0.3 ease;
+}
+
+.value-card:hover {
+    transform: translateY(-5px)
+}
+
+.value-icon {
+    font-size: 2rem;
+    margin: 1rem 0;
+    color: var(--color-text-secondary)
+}
+
+/* About sections */
+.about-section {
+    margin-bottom: 3rem;
+}
+
+.section-content {
+    line-height: 1.6;
+    color: var(--color-text-secondary)
+}
+
+
+/* Call to action */
+.cta-section {
+    text-align: center;
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.cta-section h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.cta-section p {
+    margin-bottom: 2rem;
+    color: var(--color-text-secondary);
 }
 
 @media (max-width: 768px) {
     html {
         font-size: 14px;
+    }
+
+    .about-container {
+        padding: 1rem;
+    }
+
+    .section-title {
+        font-size: 2rem;
+    }
+
+    .section-subtitle {
+        font-size: 1.5rem;
+    }
+
+    .values-grid {
+        grid-template-columns: 1fr;
     }
 }
