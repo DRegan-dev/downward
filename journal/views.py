@@ -9,3 +9,32 @@ def home(request):
     """
 
     return render(request, 'journal/home.html')
+
+def about(request):
+    """
+    About page explaining the purpose of Downward
+    """
+    context = {
+        'sections': [
+            {
+                'title': 'Our Purpose',
+                'content': 'Downward is a private, guided space for exploring mental, emotional, and existential journeys. Unlike traditional journaling tools, we embrace the neccessary descent - moments when we step back, slow down, or let go.'
+            },
+            {
+                'title': 'Why Descent?'
+                'content': 'We believe that not every fail is a failure. Somtimes, going own is the only way to truly understand ourselves. Our platform provides a safe, structured environment for processing decline, loss, burnout, and complexity.'
+            },
+            {
+                'title': 'How It Works',
+                'content': 'Through guided sessions, reflective prompts, and optional rituals, Downward helps you exploreyour descent in a meaningful way. Our structured approach ensures you can process your journey while maintaining privacy and control.'
+            }
+        ], 
+        'values': [
+            'Emotional Authenticity',
+            'Guided Reflection',
+            'Non-judgemental Processing',
+            'Structured Exploration',
+            'Privacy First'
+        ]
+    }
+    return render(request, 'journal.about.html', context)

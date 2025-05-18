@@ -241,6 +241,13 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--color-text-secondary);
 }
 
+/* About page styles */
+.about-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding 2rem
+}
+
 @media (max-width: 768px) {
     html {
         font-size: 14px;
