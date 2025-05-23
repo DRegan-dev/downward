@@ -22,7 +22,7 @@ class DescentSession(models.Model):
         return f"{self.user.username}'s {self.descent_type.name} session"
     
 class Entry(models.Model):
-    session = models.ForeignKey(DescentSession, on_delete=CASCADE)
+    session = models.ForeignKey(DescentSession, on_delete=models.CASCADE)
     prompt = models.TextField()
     response = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
