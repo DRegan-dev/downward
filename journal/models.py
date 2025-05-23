@@ -10,3 +10,13 @@ class DescentType(models.Model):
 
     def __str__(self):
         return self.name
+    
+class DescentSession(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    descent_type = models.ForeignKey(DescentType, on_delete=models.CASCADE)
+    started_at = models.DateTimeField(auto_now_add=True)
+    completed = models.BooleanField(default=False)
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.user.username}'s {self.descent_type.name} session"
