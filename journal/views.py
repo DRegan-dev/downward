@@ -21,7 +21,7 @@ def about(request):
                 'content': 'Downward is a private, guided space for exploring mental, emotional, and existential journeys. Unlike traditional journaling tools, we embrace the neccessary descent - moments when we step back, slow down, or let go.'
             },
             {
-                'title': 'Why Descent?'
+                'title': 'Why Descent?',
                 'content': 'We believe that not every fail is a failure. Somtimes, going own is the only way to truly understand ourselves. Our platform provides a safe, structured environment for processing decline, loss, burnout, and complexity.'
             },
             {
@@ -37,7 +37,7 @@ def about(request):
             'Privacy First'
         ]
     }
-    return render(request, 'journal.about.html', context)
+    return render(request, 'journal/about.html', context)
 
 def privacy(request):
     """
@@ -64,3 +64,29 @@ def privacy(request):
         ]
     }
     return render(request, 'journal/privacy.html', context)
+
+def terms(request):
+    """
+    Terms of Service page
+    """
+    context = {
+        'sections': [
+            {
+                'title': 'Acceptance of Terms',
+                'content': 'By using Downward, you agree to ther Terms of Service and our Privacy Policy. Please read them carefully before using our service.'
+            },
+            {
+                'title': 'User Conduct',
+                'content': 'You agree to use Downward in a respectful and appropriate manner. The Platform is intended for personal reflection and emotional processing.'
+            },
+            {
+                'title': 'Intellectual Property',
+                'content': 'All content you create through Downward remains your property. However, you grant us a license to store and display this content as necessary for the operation of the service.'
+            },
+            {
+                'title': 'Termination',
+                'content': 'We reserve the right to terminate or suspend your account if you violate these Terms of Service. You can also delete your account at any time.'
+            }
+        ]
+    }
+    return render(request, 'journal/terms.html', context)

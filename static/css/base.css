@@ -358,6 +358,19 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: 1rem;
 }
 
+.policy-content p {
+    margin-bottom: 1rem;
+}
+
+.policy-content ol, .policy-content ul {
+    margin-bottom: 1rem;
+    padding-left: 2rem;
+}
+
+.policy-content li {
+    margin-bottom: 0.5rem;
+}
+
 .section-content {
     color: var(--color-text-secondary);
 }
@@ -381,5 +394,17 @@ h1, h2, h3, h4, h5, h6 {
 
     .values-grid {
         grid-template-columns: 1fr;
+    }
+
+    .policy-container {
+        padding: 1rem;
+    }
+
+    .policy-title {
+        font-size: 2rem;
+    }
+
+    .policy-intro {
+        font-size: 1.1rem;
     }
 }

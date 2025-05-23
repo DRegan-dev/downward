@@ -46,9 +46,9 @@
         <div class="footer-content">
             <p>&copy; {% now "Y" %} Downward. A space for descent.</p>
             <nav class="footer-links">
-                <a href="#">About</a>
-                <a href="#">Privacy</a>
-                <a href="#">Terms</a>
+                <a href="{% url 'about' %}">About</a>
+                <a href="{% url 'privacy' %}">Privacy</a>
+                <a href="{% url 'terms' %}">Terms</a>
             </nav>
         </div>
      </footer>
