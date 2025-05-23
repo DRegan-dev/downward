@@ -20,3 +20,27 @@ class DescentSession(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s {self.descent_type.name} session"
+    
+class Entry(models.Model):
+    session = models.ForeignKey(DescentSession, on_delete=CASCADE)
+    prompt = models.TextField()
+    response = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Entry for {self.session}"
+    
+class Ritual(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField()
+    type = models.CharField(max_length=50, choices = [
+        ('candle', 'Candle Lighting'),
+        ('music', 'Music'),
+        ('silence', 'Silence Timer'),
+        ('custom', 'Custom Ritual')
+
+    ])
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
