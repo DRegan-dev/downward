@@ -2,51 +2,11 @@
 
 {% block content %}
 <div class="admin-container">
-    <h1 class="admin-title">Admin Dashboard</h1>
-
-    <!-- Stats Cards -->
-     <div class="stats-grid">
-        <div class="stat-card">
-            <h3>Total Users</h3>
-            <p class="stat-number">{{ total_users }}</p>
-        </div>
-        <div class="stat-card">
-            <h3>Total Sessions</h3>
-            <p class="stat-number">{{ total_sessions }}</p>
-        </div>
-        <div class="stat-card">
-            <h3>Active Sessions</h3>
-            <p class="stat-number">{{ active_sessions }}</p>
-        </div>
-        <div class="stat-card">
-            <h3>Total Entries</h3>
-            <p class="stat-number">{{ total_entries }}</p>
-        </div>
-     </div>
-
-     <!-- Recent Activity -->
-      <div class="recent-activity">
-        <h2>Recent Sessions</h2>
-        <div class="activity-list">
-            {% for session in recent_sessions %}
-            <div class="activity-item">
-                <p><strong>{{ session.user.username }}</strong> started a {{ session.descent_type.name }} session</p>
-                <p class="timestamp">{{ session.started_at }}</p>
-            </div>
-            {% endfor %}
-        </div>
-
-        <h2>Recent Entries</h2>
-        <div class="activity-list">
-            {% for entry in recent_entries %}
-            <div class="activity-item">
-                <p><strong>{{ entry.session.user.username }}</strong> added an entry</p>
-                <p class="timestamp">{{ entry.created_at }}</p>
-            </div>
-            {% endfor %}
-        </div>
+    <!-- Dashboard Header-->
+    <div class="dashboard-header">
+        <h1>Admin Dashboard</h1>
     </div>
-
+    
     <!-- Quick Actions -->
     <div class="quick-actions">
         <h2>Quick Actions</h2>
