@@ -27,4 +27,4 @@ class RitualAdmin(admin.ModelAdmin):
     list_display = ('name', 'type', 'description', 'created_at')
     list_filter = ('type',)
     search_fields = ('name', 'description')
-    ordering = ('-created_at')
+    ordering = ('-created_at',)

@@ -1,7 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.db.models import Count
 from .models import DescentType, DescentSession, Entry, Ritual
+from .forms import DecentTypeForm, RutualForm
+import datetime
 
 # Create your views here.
 def home(request):
@@ -102,13 +105,44 @@ def admin_dashboard(request):
         messages.error(request, "You don't have permission to access this page.")
         return redirect('home')
     
-    context = {
+    # Get statistics
+    stats = {
         'total_users': User.objects.count(),
         'total_sessions': DescentSession.objects.count(),
         'active_sessions': DescentSession.objects.filter(completed=False).count(),
         'total_entries': Entry.objects.count(),
-        'recent_sessions': DescentSession.objects.order_by('-started_at')[:5],
-        'recent_entries': Entry.objects.order_by('-created_at')[:5],
-        'rituals': Ritual.objects.all()
+        'total_rituals': Ritual.objects.count(),
+        'total_descent_types': DescentType.objects.count()
+    }
+    
+    # Get recent activity
+    recent_sessions = DescentSession.objects.order_by('-started_at')[:5]
+    recent_entries = Entry.objects.order_by('-created_at')[:5]
+
+    # Get session statistics by descent type
+    session_stats = DescentType.objects.annotate(
+        session_count=Count('descentsession')
+    ).order_by('-session_count')
+
+    context = {
+        'stats': stats,
+        'recent_session': recent_sessions,
+        'recent_entries': recent_entries,
+        'session_stats': session_stats,
+        'descent_types': DescentType.objects.all(),
+        'riituals': Ritual.objects.all()
     }
     return render(request, 'journal/admin_dashboard.html', context)
+
+# Descent Type Views
+@login_required
+def descent_type_list(request):
+    """
+    List all descent types with management options
+    """
+    if not request.user.is_superuser:
+        return redirect('home')
+    
+    descent_types = DescentType.objects.all()
+    return render(request, 'journal/descent_type_list.html')
+    
