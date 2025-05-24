@@ -1,7 +1,7 @@
 from django import template
 from journal.models import DescentType, Ritual
 
-register = template.library()
+register = template.Library()
 
 @register.inclusion_tag('journal/includes/descent_type_list.html')
 def render_descents_type_list():
@@ -34,7 +34,7 @@ def render_dashboard_stats():
 def render_recent_activity():
     recent_sessions = DescentSession.objects.order_by('-starter_at')[:5]
     recent_entries = Entry.objects.order_by('-created_at')[:5]
-    return [
+    return {
         'recent_sessions': recent_sessions,
         'recent_entries': recent_entries
-    ]
+    }

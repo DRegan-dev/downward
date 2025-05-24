@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Count
 from .models import DescentType, DescentSession, Entry, Ritual
-from .forms import DecentTypeForm, RutualForm
+from .forms import DecentTypeForm, RitualForm
 import datetime
 
 # Create your views here.
