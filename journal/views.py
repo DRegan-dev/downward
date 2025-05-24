@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .models import DescentType, DescentSession, Entry, Ritual
 
 # Create your views here.
 def home(request):
@@ -90,3 +92,23 @@ def terms(request):
         ]
     }
     return render(request, 'journal/terms.html', context)
+
+@login_required
+def admin_dashboard(request):
+    """
+    Custom admin dashboard with statistic and quick actions
+    """
+    if not request.user.is_superuser:
+        messages.error(request, "You don't have permission to access this page.")
+        return redirect('home')
+    
+    context = {
+        'total_users': User.objects.count(),
+        'total_sessions': DescentSession.objects.count(),
+        'active_sessions': DescentSession.objects.filter(completed=False).count(),
+        'total_entries': Entry.objects.count(),
+        'recent_sessions': DescentSession.objects.order_by('-started_at')[:5],
+        'recent_entries': Entry.objects.order_by('-created_at')[:5],
+        'rituals': Ritual.objects.all()
+    }
+    return render(request, 'journal/admin_dashboard.html', context)
