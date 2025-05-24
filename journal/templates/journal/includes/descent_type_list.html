@@ -1,0 +1,35 @@
+<div class="admin-section">
+    <h2>Descent Types</h2>
+    <div class="action-buttons">
+        <a href="{% url 'descent_type_add' %}" class="admin-button">
+            <i class="fas fa-plus"></i> Add Descent Type
+        </a>
+    </div>
+    <div class="list-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for type in descent_types %}
+                <tr>
+                    <td>{{ type.name }}</td>
+                    <td>{{ type.description }}</td>
+                    <td>
+                        <a href="{% url 'descent_type_edit' type.pk %}" class="action-button edit">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="{% url 'descent_type_delete' type.pk %}" class="action-button delete" onclick="return confirm('Are you sure?')">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </td>   
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
