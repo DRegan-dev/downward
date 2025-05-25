@@ -420,6 +420,15 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--color-text-secondary)
 }
 
+/* Start Descent Styles */
+.start-descent-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: var(--color-accent);
+    border-radius: 8px;
+}
+
 /* Action Buttons */
 .action-buttons {
     display: flex;

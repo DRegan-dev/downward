@@ -5,7 +5,20 @@
     <!-- Dashboard Header-->
     <div class="dashboard-header">
         <h1>Admin Dashboard</h1>
+        <p class="last_updated">Last Updated: {% now "F j, Y H:i" %}</p>
     </div>
+
+    <!-- Dashboard Stats -->
+    {% render_dashboard_stats %}
+
+     <!-- Recent Activity -->
+    {% render_recent_activity %}
+
+    <!-- Descent Types -->
+    {% render_descent_type_list %}
+
+    <!-- Rituals -->
+    {% render_ritual_list %}
     
     <!-- Quick Actions -->
     <div class="quick-actions">

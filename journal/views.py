@@ -1,3 +1,5 @@
+from django.contrib.auth.forms import UserChangeForm, PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -134,6 +136,29 @@ def admin_dashboard(request):
     }
     return render(request, 'journal/admin_dashboard.html', context)
 
+@login_required
+def start_descent(request):
+    """
+    Start a new descent session
+    """
+    descent_types = DescentType.objects.all()
+
+    if request.method == 'POST':
+        # Get selected descent type
+        descent_type_id = request.POST.get('descent_type')
+        descent_type = get_object_or_404(DescentType, pk=descent_type_id)
+
+        # Create new descent session
+        session = DescentSession.objects.create(
+            user=request.user,
+            descent_type=descent_type
+        )
+
+        # Redirect to the session page
+        return redirect('session_detail', pk=session.pk)
+    return render(request, 'journal/start_descent.html', {
+        'descent_types': descent_types
+    })
 # Descent Type Views
 @login_required
 def descent_type_list(request):
@@ -159,14 +184,14 @@ def descent_type_add(request):
             form.save()
             messages.success(request, 'Descent Type added succesfully.')
             return redirect('descent_type_list')
-        else:
-            form = DescentTypeForm()
+    else:
+        form = DescentTypeForm()
 
-        return render(request, 'journal/includes/form.html', {
-            'form':  form,
-            'title': 'Add Descent Type',
-            'action': 'Add'
-        })        
+    return render(request, 'journal/includes/form.html', {
+        'form':  form,
+        'title': 'Add Descent Type',
+        'action': 'Add'
+    })        
     
 @login_required
 def descent_type_edit(request, pk):
@@ -179,14 +204,14 @@ def descent_type_edit(request, pk):
             form.save()
             messages.success(request, 'Descent Type updated succesfully.')
             return redirect('descent_type_list')
-        else:
-            form = DescentTypeForm(instance=descent_type)
+    else:
+        form = DescentTypeForm(instance=descent_type)
 
-        return render(request, 'journal/includes/form.html', {
-            'form':  form,
-            'title': 'Edit Descent Type',
-            'action': 'Update'
-        })  
+    return render(request, 'journal/includes/form.html', {
+        'form':  form,
+        'title': 'Edit Descent Type',
+        'action': 'Update'
+    })  
 
 @login_required
 def descent_type_delete(request, pk):
@@ -218,7 +243,7 @@ def ritual_add(request):
         form = RitualForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Ritual added succcesfully.')
+            messages.success(request, 'Ritual added succesfully.')
             return redirect('ritual_list')
     else:
         form = RitualForm()
@@ -240,7 +265,7 @@ def ritual_edit(request, pk):
         form = RitualForm(request.POST, instance=ritual)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Ritual updated succcesfully.')
+            messages.success(request, 'Ritual updated succesfully.')
             return redirect('ritual_list')
     else:
         form = RitualForm(instance=ritual)
@@ -280,7 +305,7 @@ def session_edit(request, pk):
 
     session = get_object_or_404(DescentSession, pk=pk)
     
-    if request.method='POST':
+    if request.method == 'POST':
         # Handle session update
         messages.success(request, 'Session updated successfully.')
         return redirect('session_list')
@@ -298,3 +323,58 @@ def session_delete(request, pk):
     session.delete()
     messages.success(request, 'Session deleted successfully.')
     return redirect('session_list')
+
+@login_required
+def user_list(request):
+    if not request.user.is_superuser:
+        return redirect('home')
+    
+    users = User.objects.all()
+    return render(request, 'journal/user_list.html', {
+        'users': users
+    })
+
+@login_required
+def user_edit(request, pk):
+    if not request.user.is_superuser:
+        return redirect('home')
+    
+    user = get_object_or_404(User, pk=pk)
+
+    if request.method == 'POST':
+        # update basic user info
+        user_form = UserChangeForm(request.POST, instance=user)
+        password_form = PasswordChangeForm(user, request.POST)
+
+        if user_form.is_valid():
+            user_form.save()
+            messages.success(request, 'User information updated successfully.')
+
+            # Update password if provided
+            if password_form.is_valid():
+                user = password_form.save()
+                update_session_auth_hash(request, user)
+                messages.success(request, 'Password updated Successfully.')
+
+            return redirect('user_list')
+    else:
+        user_form = UserChangeForm(instance=user)
+        password_form = PasswordChangeForm(user)
+    
+    return render(request, 'journal/user_edit.html')
+
+@login_required
+def user_delete(request, pk):
+    if not request.user.is_superuser:
+        return redirect('home')
+    
+    user = get_object_or_404(User, pk=pk)
+
+    # Prevent deleteion of the last Superuser
+    if user.objects.filter(is_superuser=True).count() == 1 and user.is_superuser:
+        messages.error(request, 'Cannot delete the last superuser')
+        return redirect('user_list')
+    
+    user.delete()
+    message.success(request, 'User deleted successfully.')
+    return redirect('user_list')

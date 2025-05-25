@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<div class="start-descent-container">
+    <h1>Start new Descent</h1>
+
+    <form class="descent-form" method="post">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="descent_type">Choose a Descent Type</label>
+            <select name="descent_type" id="descent_type" class="form-control">
+                {% for type in descent_types %}
+                <option value="{{ type.pk }}">{{ type.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form_buttons">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-arrow-down"></i> Begin Descent 
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
