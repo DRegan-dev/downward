@@ -230,4 +230,34 @@ def ritual_add(request):
     })    
     
 @login_required
+def ritual_edit(request, pk):
+    if not request.user.is_superuser:
+        return redirect('home')
     
+    ritual = get_object_or_404(Ritual, pk=pk)
+    
+    if request.method == 'POST':
+        form = RitualForm(request.POST, instance=ritual)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Ritual updated succcesfully.')
+            return redirect('ritual_list')
+    else:
+        form = RitualForm(instance=ritual)
+
+    return render(request, 'journal/includes/form.html', {
+        'form':  form,
+        'title': 'Edit Ritual',
+        'action': 'Update'
+    })  
+
+@login_required
+def ritual_delete(request, pk):
+    if not request.user.is_superuser:
+        return redirect('home')
+    
+    ritual = get_object_or_404(Ritual, pk=pk)
+    ritual.delete()
+    messages.success(request, 'Ritual updated succcesfully.')
+    return redirect('ritual_list')
+         
