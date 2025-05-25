@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Count
 from .models import DescentType, DescentSession, Entry, Ritual
-from .forms import DecentTypeForm, RitualForm
+from .forms import DescentTypeForm, RitualForm
 import datetime
 
 # Create your views here.
@@ -144,5 +144,90 @@ def descent_type_list(request):
         return redirect('home')
     
     descent_types = DescentType.objects.all()
-    return render(request, 'journal/descent_type_list.html')
+    return render(request, 'journal/descent_type_list.html', {
+        'descent_types': descent_types
+    })
+
+@login_required
+def descent_type_add(request):
+    if not request.user.is_superuser:
+        return redirect('home')
+    
+    if request.method == "POST":
+        form = DescentTypeForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Descent Type added succesfully.')
+            return redirect('descent_type_list')
+        else:
+            form = DescentTypeForm()
+
+        return render(request, 'journal/includes/form.html', {
+            'form':  form,
+            'title': 'Add Descent Type',
+            'action': 'Add'
+        })        
+    
+@login_required
+def descent_type_edit(request, pk):
+    if not request.user.is_superuser:
+        return redirect('home')
+    
+    if request.method == "POST":
+        form = DescentTypeForm(request.POST, instance=descent_type)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Descent Type updated succesfully.')
+            return redirect('descent_type_list')
+        else:
+            form = DescentTypeForm(instance=descent_type)
+
+        return render(request, 'journal/includes/form.html', {
+            'form':  form,
+            'title': 'Edit Descent Type',
+            'action': 'Update'
+        })  
+
+@login_required
+def descent_type_delete(request, pk):
+    if not request.user.is_superuser:
+        return redirect('home')
+    
+    descent_type = get_object_or_404(DescentType, pk=pk)
+    descent_type.delete()
+    messages.success(request, 'Descent Type deleted successfully')
+    return redirect('descent_type_list')
+
+# Ritual Views
+@login_required
+def ritual_list(request):
+    if not request.user.is_superviser:
+        return redirect('home')
+    
+    rituals = Ritual.objects.all()
+    return render(request, 'journal.ritual_list.html', {
+        'rituals': rituals
+    })
+
+@login_required
+def ritual_add(request):
+    if not request.user.is_superuser:
+        return redirect('home')
+    
+    if request.method == 'POST':
+        form = RitualForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Ritual added succcesfully.')
+            return redirect('ritual_list')
+    else:
+        form = RitualForm()
+
+    return render(request, 'journal/includes/form.html', {
+        'form':  form,
+        'title': 'Add Ritual',
+        'action': 'Add'
+    })    
+    
+@login_required
     

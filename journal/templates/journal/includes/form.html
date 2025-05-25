@@ -1,0 +1,15 @@
+<div class="admin-form-container">
+    <h2>{{ title }}</h2>
+    <form class="admin-form" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            {{ form.as_p }}
+        </div>
+        <div class="form-buttons">
+            <button type="submit" class="admin-button primary">
+                <i class="fas fa-{{ action|lower }}-circle"></i> {{ action }}
+            </button>
+            <a href="{% url 'admin_dashboard' %}" class="admin-button secondary"></a>
+        </div>
+    </form>
+</div>
