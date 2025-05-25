@@ -260,4 +260,41 @@ def ritual_delete(request, pk):
     ritual.delete()
     messages.success(request, 'Ritual updated succcesfully.')
     return redirect('ritual_list')
-         
+
+# Session Views
+
+@login_required
+def session_list(request):
+    if not request.user.is_superuser:
+        return redirect('home')
+
+    sessions = DescentSession.objects.all().order_by('-started_at')
+    return render(request, 'journal/session_list.html', {
+        'sessions': sessions
+    })
+
+@login_required
+def session_edit(request, pk):
+    if not request.user.is_superuser:
+        return redirect('home')
+
+    session = get_object_or_404(DescentSession, pk=pk)
+    
+    if request.method='POST':
+        # Handle session update
+        messages.success(request, 'Session updated successfully.')
+        return redirect('session_list')
+    else:
+        return render(request, 'journal/session_edit.html', {
+            'session': session
+        })
+    
+@login_required
+def session_delete(request, pk):
+    if not request.user.is_superuser:
+        return redirect('home')
+
+    session = get_object_or_404(DescentSession, pk=pk)
+    session.delete()
+    messages.success(request, 'Session deleted successfully.')
+    return redirect('session_list')
