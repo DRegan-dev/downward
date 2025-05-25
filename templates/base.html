@@ -24,7 +24,7 @@
             <ul class="nav-links">
                 {% if user.is_authenticated %}
                     <li><a href="{% url 'start_descent' %}">New Descent</a></li>
-                    <li><a href="#{% url 'journal_history' %}">My Journeys</a></li>
+                    <li><a href="{% url 'journal_history' %}">My Journeys</a></li>
                     {% if user.is_superuser %}
                     <li><a href="{% url 'admin_dashboard' %}">Admin Dashboard</a></li>
                     {% endif %}

@@ -159,6 +159,21 @@ def start_descent(request):
     return render(request, 'journal/start_descent.html', {
         'descent_types': descent_types
     })
+
+@login_required
+def journal_history(request):
+    """
+    Display User's descent history
+    """
+    # Get all sessions for the current user
+    sessions = DescentSession.objects.filter(user=request.user).order_by('-started_at')
+
+    context = {
+        'sessions': sessions,
+        'descent_types': DescentType.objects.all()
+    }
+    return render(request, 'journal/journal_history.html', context)
+
 # Descent Type Views
 @login_required
 def descent_type_list(request):
