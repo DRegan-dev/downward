@@ -1,0 +1,27 @@
+<div class="activity-section">
+    <h2>Recent Activity</h2>
+    <div class="activity-grid">
+        <div class="activity-column">
+            <h3>Recent Session</h3>
+            <div class="activity-list">
+                {% for session in recent_sessions %}
+                <div class="activity-item">
+                    <p><strong>{{ session.user.username }}</strong> started a {{ session.descent_type.name }} session</p>
+                    <p class="timestamp">{{ session.started_at }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="activity-column">
+            <h3>Recent Entries</h3>
+            <div class="activity-list">
+                {% for entry in recent_entries %}
+                <div class="activity-item">
+                    <p><strong>{{ entry.session.user.username }}</strong>added an entry</p>
+                    <p class="timestamp">{{ entry.created_at }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>

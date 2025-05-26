@@ -23,15 +23,27 @@
             </div>
             <ul class="nav-links">
                 {% if user.is_authenticated %}
-                    <li><a href="{% url 'start_descent' %}">New Descent</a></li>
-                    <li><a href="{% url 'journal_history' %}">My Journeys</a></li>
+                    <li><a href="{% url 'start_descent' %}">
+                        <i class="fas fa-arrow-down"></i> New Descent
+                    </a></li>
+                    <li><a href="{% url 'journal_history' %}">
+                        <i class="fas fa-history"></i> My Journeys
+                    </a></li>
                     {% if user.is_superuser %}
-                    <li><a href="{% url 'admin_dashboard' %}">Admin Dashboard</a></li>
+                    <li><a href="{% url 'admin_dashboard' %}">
+                        <i class="fas fa-cog"></i> Admin Dashboard
+                    </a></li>
                     {% endif %}
-                    <li><a href="{% url 'logout' %}">Logout</a></li>
+                    <li><a href="{% url 'logout' %}">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a></li>
                 {% else %}
-                    <li><a href="{% url 'login' %}">Login</a></li>
-                    <li><a href="{% url 'register' %}">Register</a></li>
+                    <li><a href="{% url 'login' %}">
+                        <i class="fas fa-sig-in-alt"></i> Login
+                    </a></li>
+                    <li><a href="{% url 'register' %}">
+                        <i class="fas fa-user-plus"></i> Register
+                    </a></li>
                 {% endif %}
             </ul>
         </nav>

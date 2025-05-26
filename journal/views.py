@@ -4,8 +4,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Count
+from django.utils import timezone
 from .models import DescentType, DescentSession, Entry, Ritual
 from .forms import DescentTypeForm, RitualForm
+from django.contrib.auth.models import User
 import datetime
 
 # Create your views here.
@@ -25,15 +27,15 @@ def about(request):
         'sections': [
             {
                 'title': 'Our Purpose',
-                'content': 'Downward is a private, guided space for exploring mental, emotional, and existential journeys. Unlike traditional journaling tools, we embrace the neccessary descent - moments when we step back, slow down, or let go.'
+                'content': 'Downward is a private, guided space for exploring mental, emotional, and existential journeys. Unlike traditional journaling tools, we embrace the necessary descent - moments when we step back, slow down, or let go.'
             },
             {
                 'title': 'Why Descent?',
-                'content': 'We believe that not every fail is a failure. Somtimes, going own is the only way to truly understand ourselves. Our platform provides a safe, structured environment for processing decline, loss, burnout, and complexity.'
+                'content': 'We believe that not every fail is a failure. Sometimes, going down is the only way to truly understand ourselves. Our platform provides a safe, structured environment for processing decline, loss, burnout, and complexity.'
             },
             {
                 'title': 'How It Works',
-                'content': 'Through guided sessions, reflective prompts, and optional rituals, Downward helps you exploreyour descent in a meaningful way. Our structured approach ensures you can process your journey while maintaining privacy and control.'
+                'content': 'Through guided sessions, reflective prompts, and optional rituals, Downward helps you explore your descent in a meaningful way. Our structured approach ensures you can process your journey while maintaining privacy and control.'
             }
         ], 
         'values': [
@@ -54,7 +56,7 @@ def privacy(request):
         'sections': [
             {
                 'title': 'Data Collection',
-                'content': 'We collect only the minimum data neccesary for your descent sessions. This includesyour username, email address, and session data. No personal data is shared with third parties.'
+                'content': 'We collect only the minimum data necesary for your descent sessions. This includes your username, email address, and session data. No personal data is shared with third parties.'
             },
             {
                 'title': 'Session Data',
@@ -66,7 +68,7 @@ def privacy(request):
             },
             {
                 'title': 'Your Rights',
-                'content': 'You have the right to view, modify, or delete your session data at any time. You can laso request a complete data export.'
+                'content': 'You have the right to view, modify, or delete your session data at any time. You can also request a complete data export.'
             }
         ]
     }
@@ -80,7 +82,7 @@ def terms(request):
         'sections': [
             {
                 'title': 'Acceptance of Terms',
-                'content': 'By using Downward, you agree to ther Terms of Service and our Privacy Policy. Please read them carefully before using our service.'
+                'content': 'By using Downward, you agree to these Terms of Service and our Privacy Policy. Please read them carefully before using our service.'
             },
             {
                 'title': 'User Conduct',
@@ -128,11 +130,11 @@ def admin_dashboard(request):
 
     context = {
         'stats': stats,
-        'recent_session': recent_sessions,
+        'recent_sessions': recent_sessions,
         'recent_entries': recent_entries,
         'session_stats': session_stats,
         'descent_types': DescentType.objects.all(),
-        'riituals': Ritual.objects.all()
+        'rituals': Ritual.objects.all()
     }
     return render(request, 'journal/admin_dashboard.html', context)
 
@@ -213,6 +215,8 @@ def descent_type_edit(request, pk):
     if not request.user.is_superuser:
         return redirect('home')
     
+    descent_type = get_object_or_404(DescentType, pk=pk)
+    
     if request.method == "POST":
         form = DescentTypeForm(request.POST, instance=descent_type)
         if form.is_valid():
@@ -245,7 +249,7 @@ def ritual_list(request):
         return redirect('home')
     
     rituals = Ritual.objects.all()
-    return render(request, 'journal.ritual_list.html', {
+    return render(request, 'journal/ritual_list.html', {
         'rituals': rituals
     })
 
@@ -315,10 +319,30 @@ def session_list(request):
 
 @login_required
 def session_edit(request, pk):
+    """
+    Edit a descent session
+    """
     if not request.user.is_superuser:
-        return redirect('home')
+        session = get_object_or_404(DescentSession, pk=pk)
+        
+        if session.user != request.user:
+            messages.error(request, "You don't have permission to edit this session.")
+            return redirect('journal_history')
+        
+        if request.method == 'POST':
+            session.completed = request.POST.get('completed', False) == 'True'
+            if session.completed:
+                session.completed_at = timezone.now()
+            session.save()
+            messages.success(request, 'Session updated successfully.')
+            return redirect('session_detail', pk=pk)
+            
+        return render(request, 'journal/session_edit.html', {
+            'session': session
+        })
+    
 
-    session = get_object_or_404(DescentSession, pk=pk)
+    
     
     if request.method == 'POST':
         # Handle session update
@@ -376,7 +400,11 @@ def user_edit(request, pk):
         user_form = UserChangeForm(instance=user)
         password_form = PasswordChangeForm(user)
     
-    return render(request, 'journal/user_edit.html')
+    return render(request, 'journal/user_edit.html', {
+        'user_form': user_form,
+        'password_form': password_form,
+        'user': user
+    })
 
 @login_required
 def user_delete(request, pk):
@@ -391,5 +419,5 @@ def user_delete(request, pk):
         return redirect('user_list')
     
     user.delete()
-    message.success(request, 'User deleted successfully.')
+    messages.success(request, 'User deleted successfully.')
     return redirect('user_list')

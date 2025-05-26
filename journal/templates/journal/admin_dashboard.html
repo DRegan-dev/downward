@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load admin_tags %}
 
 {% block content %}
 <div class="admin-container">
@@ -24,12 +25,13 @@
     <div class="quick-actions">
         <h2>Quick Actions</h2>
         <div class="action-buttons">
-            <a href="{{ url 'admin:journal_descenttype_add' }}" class="action-button">
+            <a href="{% url 'admin:journal_descenttype_add' %}" class="action-button">
                 <i class="fas fa-plus"></i> Add Descent Type
             </a>
-            <a href="{{ url 'admin:journal_ritual_add' }}" class="action-button">
+            <a href="{% url 'admin:journal_ritual_add' %}" class="action-button">
                 <i class="fas fa-plus"></i> Add Ritual
             </a>
         </div>
     </div>
 </div>
+{% endblock %}
