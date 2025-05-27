@@ -25,7 +25,7 @@ class UserRegistrationForm(UserCreationForm):
             'class': "form_input",
             'placeholder': 'Enter your Password'
         })
-        self.fields['username'].widget.attrs.update({
+        self.fields['password2'].widget.attrs.update({
             'class': "form_input",
             'placeholder': 'Enter your Password'
         })
