@@ -3,6 +3,7 @@
 
 {% block content %}
 <div class="start-descent-container">
+    {% if not session %}
     <h1>Start new Descent</h1>
 
     <form class="descent-form" method="post">
@@ -12,7 +13,7 @@
             <label for="descent_type">Choose a Descent Type</label>
             <select name="descent_type" id="descent_type" class="form-control">
                 {% for type in descent_types %}
-                <option value="{{ type.pk }}">{{ type.name }}</option>
+                <option value="{{ type.pk }}">{{ type.name }} - {{ get.get_type_display }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -23,5 +24,47 @@
             </button>
         </div>
     </form>
+    {% else %}
+    <h1>Starting Dsecent: {{ session.descent_type_name }}</h1>
+
+    {% if pre_rituals %}
+    <div class="ritual_section">
+        <h2>Pre-Descent Rituals</h2>
+        <div class="ritual-list">
+            {% for ritual in pre_rituals %}
+            <div class="ritual-card">
+                <h3>{{ ritual.name }}</h3>
+                <p>{{ ritual.description }}</p>
+                <div class="instructions">{{ ritual.instructions }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if during_rituals %}
+    <div class="ritual_section">
+        <h2>During Descent Rituals</h2>
+        <div class="ritual-list">
+            {% for ritual in pre_rituals %}
+            <div class="ritual-card">
+                <h3>{{ ritual.name }}</h3>
+                <p>{{ ritual.description }}</p>
+                <div class="instructions">{{ ritual.instructions }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="action-buttons">
+        <a href="{% url 'descent_continue' session.pk %}" class="btn btn-primary">
+            <i class="fas fa-arrow-right"></i>  Begin Descent
+        </a>
+        <a href="{% url 'abandon_descent' session.pk %}" class="btn btn-danger">
+            <i class="fas fa-times"></i>  Abandon
+        </a>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

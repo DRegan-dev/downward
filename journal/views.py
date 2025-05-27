@@ -143,7 +143,6 @@ def start_descent(request):
     """
     Start a new descent session
     """
-    descent_types = DescentType.objects.all()
 
     if request.method == 'POST':
         # Get selected descent type
@@ -154,13 +153,117 @@ def start_descent(request):
         session = DescentSession.objects.create(
             user=request.user,
             descent_type=descent_type
+            status='STARTED'
         )
 
+        # Get pre-descent rituals
+        pre-rituals = Ritual.objects.filter(type='PRE')
+        during_rituals = Ritual.objects.filter(type='DURING')
+
         # Redirect to the session page
-        return redirect('session_detail', pk=session.pk)
+        return render(request, 'journal/start_descent.html', {
+            'session': session,
+            'pre_rituals': pre_rituals
+            'during_rituals': during_rituals
+        })
+    
+    descent_types = DescentType.objects.all()
     return render(request, 'journal/start_descent.html', {
         'descent_types': descent_types
     })
+
+
+
+@login_required
+def descent_start(request, pk):
+    session = get_object_or_404(DescentSession, pk=pk)
+
+    if session.user != request.user:
+        messages.error(request, "You don't have permission to access this session.")
+        return redirect('journal_history')
+    
+    # Get during-descent rituals
+    during_rituals = Ritual.objects.filter(type='DURING')
+
+    return render(request, 'journal/descent_start.html', {
+        'session': session,
+        'during_rituals': during_rituals
+    })
+
+@login_required
+def descent_continue(request, pk):
+    session = get_object_or_404(DescentSession, pk=pk)
+
+    if session.user != request.user:
+        messages.error(request, "You don't have permission to access this session.")
+        return redirect('journal_history')
+    
+    if request.method == 'POST':
+        content = request.POST.get('content')
+        emotion-level = request.POST.get('emotion-level')
+        reflection = request.POST.get('reflection')
+
+        Entry.objects.create(
+            session=session,
+            content=content,
+            emotion_level=emotion_level,
+            reflection=reflection
+        )
+
+        messages.success(request, "Entry add successfully.")
+        return redirect('descent_continue', pk=pk)
+    
+    return render(request, 'journal/descent_continue.html', {
+        'session': session
+    })
+
+@login_required
+def complete_descent(request, pk):
+    session = get_object_or_404(DescentSession, pk=pk)
+
+    if session.user != request.user:
+        messages.error(request, "You don't have permission to access this session.")
+        return redirect('journal_history')
+    
+    if request.method == 'POST':
+        session.status = 'COMPLETED'
+        session.completed_at = timezone.now()
+        session.save()
+
+        # Get post-descent rituals
+        post_rituals = Ritual.objects.filter(type='POST')
+
+        return render(request, 'journal/descent_complete.html', {
+            'session': session,
+            'post_rituals': post_rituals
+        })
+    
+    return render(request, 'journal/descent_complete.html', {
+        'session': session
+    })
+
+@login_required
+def abandon_descent(request, pk):
+    session = get_object_or_404(DescentSession, pk=pk)
+
+    if session.user != request.user:
+        messages.error(request, "You don't have permission to access this session.")
+        return redirect('journal_history')
+    
+    if request.method == 'POST':
+        session.status = 'ABANDONED'
+        session.completed_at = timezone.now()
+        session.save()
+
+        messages.warning(request, "Descent session abandoned.")
+        return redirect('journal_history')
+    
+    return render(request, 'journal/descent_abandon.html', {
+        'session': session
+    })
+    
+
+
 
 @login_required
 def journal_history(request):
