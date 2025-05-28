@@ -25,7 +25,7 @@ def render_dashboard_stats():
     stats = {
         'total_users': User.objects.count(),
         'total_sessions': DescentSession.objects.count(),
-        'active_sessions': DescentSession.objects.filter(completed=False).count(),
+        'active_sessions': DescentSession.objects.filter(status__in=['STARTED', 'IN_PROGRESS']).count(),
         'total_entries': Entry.objects.count(),
         'total_rituals': Ritual.objects.count(),
         'total_descent_types': DescentType.objects.count()
@@ -35,7 +35,7 @@ def render_dashboard_stats():
 @register.inclusion_tag('journal/includes/recent_activity.html')
 def render_recent_activity():
     recent_sessions = DescentSession.objects.order_by('-started_at')[:5]
-    recent_entries = Entry.objects.order_by('-created_at')[:5]
+    recent_entries = Entry.objects.order_by('-timestamp')[:5]
     return {
         'recent_sessions': recent_sessions,
         'recent_entries': recent_entries

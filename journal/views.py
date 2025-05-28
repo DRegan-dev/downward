@@ -113,7 +113,7 @@ def admin_dashboard(request):
     stats = {
         'total_users': User.objects.count(),
         'total_sessions': DescentSession.objects.count(),
-        'active_sessions': DescentSession.objects.filter(completed=False).count(),
+        'active_sessions': DescentSession.objects.filter(status__in=['STARTED', 'IN_PROGRESS']).count(),
         'total_entries': Entry.objects.count(),
         'total_rituals': Ritual.objects.count(),
         'total_descent_types': DescentType.objects.count()
@@ -121,7 +121,7 @@ def admin_dashboard(request):
     
     # Get recent activity
     recent_sessions = DescentSession.objects.order_by('-started_at')[:5]
-    recent_entries = Entry.objects.order_by('-created_at')[:5]
+    recent_entries = Entry.objects.order_by('-timestamp')[:5]
 
     # Get session statistics by descent type
     session_stats = DescentType.objects.annotate(
@@ -152,18 +152,18 @@ def start_descent(request):
         # Create new descent session
         session = DescentSession.objects.create(
             user=request.user,
-            descent_type=descent_type
+            descent_type=descent_type,
             status='STARTED'
         )
 
         # Get pre-descent rituals
-        pre-rituals = Ritual.objects.filter(type='PRE')
+        pre_rituals = Ritual.objects.filter(type='PRE')
         during_rituals = Ritual.objects.filter(type='DURING')
 
         # Redirect to the session page
         return render(request, 'journal/start_descent.html', {
             'session': session,
-            'pre_rituals': pre_rituals
+            'pre_rituals': pre_rituals,
             'during_rituals': during_rituals
         })
     
@@ -199,8 +199,8 @@ def descent_continue(request, pk):
         return redirect('journal_history')
     
     if request.method == 'POST':
-        content = request.POST.get('content')
-        emotion-level = request.POST.get('emotion-level')
+        content = request.POST.get('content'),
+        emotion_level = request.POST.get('emotion-level'),
         reflection = request.POST.get('reflection')
 
         Entry.objects.create(

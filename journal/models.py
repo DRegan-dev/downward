@@ -14,8 +14,9 @@ class DescentType(models.Model):
 
     name = models.CharField(max_length=100)
     description = models.TextField()
-    type = models.CharField(max_length=20, choice=TYPE_CHOICES)
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     
 
     def __str__(self):
@@ -34,9 +35,13 @@ class DescentSession(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='STARTED')
     started_at = models.DateTimeField(auto_now_add=True)
     completed_at = models.DateTimeField(null=True, blank=True)
-    abandoned_at = models.DateTimeField(null=TRUE, blank=True)
+    abandoned_at = models.DateTimeField(null=True, blank=True)
     notes = models.TextField(blank=True)
 
+    @property
+    def is_completed(self):
+        return self.status == 'COMPLETED'
+        ''
     @property
     def duration(self):
         if self.status == 'COMPLETED':
@@ -49,7 +54,7 @@ class DescentSession(models.Model):
         return f"{self.user.username}'s {self.descent_type.name} session"
     
 class Entry(models.Model):
-    session = models.ForeignKey(DescentSession, on_delete=models.CASCADE)
+    session = models.ForeignKey(DescentSession, on_delete=models.CASCADE, related_name='entries')
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
     emotion_level = models.IntegerField(default=5) # 1-10 scale
