@@ -19,29 +19,29 @@
      <header class="main-header">
         <nav class="main-navigation">
             <div class="logo">
-                <a href="{% url 'home' %}">Downward</a>
+                <a href="{% url 'journal:home' %}">Downward</a>
             </div>
             <ul class="nav-links">
                 {% if user.is_authenticated %}
-                    <li><a href="{% url 'start_descent' %}">
+                    <li><a href="{% url 'journal:start_descent' %}">
                         <i class="fas fa-arrow-down"></i> New Descent
                     </a></li>
-                    <li><a href="{% url 'journal_history' %}">
+                    <li><a href="{% url 'journal:journal_history' %}">
                         <i class="fas fa-history"></i> My Journeys
                     </a></li>
                     {% if user.is_superuser %}
-                    <li><a href="{% url 'admin_dashboard' %}">
+                    <li><a href="{% url 'journal:admin_dashboard' %}">
                         <i class="fas fa-cog"></i> Admin Dashboard
                     </a></li>
                     {% endif %}
-                    <li><a href="{% url 'logout' %}">
+                    <li><a href="{% url 'accounts:logout' %}">
                         <i class="fas fa-sign-out-alt"></i> Logout
                     </a></li>
                 {% else %}
-                    <li><a href="{% url 'login' %}">
+                    <li><a href="{% url 'accounts:login' %}">
                         <i class="fas fa-sig-in-alt"></i> Login
                     </a></li>
-                    <li><a href="{% url 'register' %}">
+                    <li><a href="{% url 'accounts:register' %}">
                         <i class="fas fa-user-plus"></i> Register
                     </a></li>
                 {% endif %}
@@ -61,9 +61,9 @@
         <div class="footer-content">
             <p>&copy; {% now "Y" %} Downward. A space for descent.</p>
             <nav class="footer-links">
-                <a href="{% url 'about' %}">About</a>
-                <a href="{% url 'privacy' %}">Privacy</a>
-                <a href="{% url 'terms' %}">Terms</a>
+                <a href="{% url 'journal:about' %}">About</a>
+                <a href="{% url 'journal:privacy' %}">Privacy</a>
+                <a href="{% url 'journal:terms' %}">Terms</a>
             </nav>
         </div>
      </footer>

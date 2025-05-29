@@ -16,11 +16,14 @@ class DescentType(models.Model):
     description = models.TextField()
     type = models.CharField(max_length=20, choices=TYPE_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
     
-
     def __str__(self):
         return self.name
+    
+    class Meta:
+        verbose_name = 'Descent Type'
+        verbose_name_plural = 'Descent Types'
+        ordering = ['name']
     
 class DescentSession(models.Model):
     STATUS_CHOICES = [
@@ -39,19 +42,15 @@ class DescentSession(models.Model):
     notes = models.TextField(blank=True)
 
     @property
-    def is_completed(self):
-        return self.status == 'COMPLETED'
-        ''
-    @property
     def duration(self):
-        if self.status == 'COMPLETED':
+        if self.completed_at:
             return self.completed_at - self.started_at
-        elif self.status == 'ABANDONED':
+        elif self.abandoned_at:
             return self.abandoned_at - self.started_at
-        return timezone.now() - self.started_at
+        return timezone.timedelta()
 
     def __str__(self):
-        return f"{self.user.username}'s {self.descent_type.name} session"
+        return f"{self.user.username}'s {self.descent_type.name} descent"
     
 class Entry(models.Model):
     session = models.ForeignKey(DescentSession, on_delete=models.CASCADE, related_name='entries')
@@ -74,6 +73,7 @@ class Ritual(models.Model):
     description = models.TextField()
     type = models.CharField(max_length=20, choices=TYPE_CHOICES)
     instructions = models.TextField()
+    descent_type = models.ForeignKey(DescentType, on_delete=models.CASCADE, related_name='rituals', default=1)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

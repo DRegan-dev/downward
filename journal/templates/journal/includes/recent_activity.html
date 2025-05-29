@@ -18,7 +18,7 @@
                 {% for entry in recent_entries %}
                 <div class="activity-item">
                     <p><strong>{{ entry.session.user.username }}</strong>added an entry</p>
-                    <p class="timestamp">{{ entry.created_at }}</p>
+                    <p class="timestamp">{{ entry.timestamp }}</p>
                 </div>
                 {% endfor %}
             </div>

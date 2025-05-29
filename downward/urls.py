@@ -20,6 +20,7 @@ from journal import views
 urlpatterns = [
     path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('admin/', admin.site.urls),
-    path('', include('journal.urls')),
-    path('accounts/', include('accounts.urls')),
+    path('journal/', include('journal.urls', namespace='journal')),
+    path('accounts/', include('accounts.urls', namespace='accounts')),
+    path('', include('journal.urls', namespace='journal')),
 ]

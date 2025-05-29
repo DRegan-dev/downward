@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="session_detail">
+    <h1>Descent Session: {{ session.descent_type.name }}</h1>
+
+    <div class="session-info">
+        <p><i class="fas fa-clock"></i> Started: {{ session.started_at }}</p>
+        {% if session.completed_at %}
+            <p><i class="fas fa-check"></i> Completed: {{ session.completed_at }}</p>
+            <p><i class="fas fa-clock"></i> Duration: {{ session.complete_at|timesince:session.started_at }}</p>
+        {% endif %}
+    </div>
+
+    <div class="rituals">
+        <h2>Pre-Descent Rituals</h2>
+        <div class="ritual-list">
+            {% for ritual in pre_rituals %}
+            <div class="ritual-card">
+                <h3>{{ ritual.name }}</h3>
+                <p>{{ ritual.description }}</p>
+                <div class="instructions">{{ ritual.instructions }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <h2>During Descent Rituals</h2>
+    <div class="ritual-list">
+        {% for ritual in during_rituals %}
+        <div class="ritual-card">
+            <h3>{{ ritual.name }}</h3>
+            <p>{{ ritual.description }}</p>
+            <div class="instructions">{{ ritual.instructions }}</div>
+        </div>
+        {% endfor %}
+    </div>   
+
+    <div class="entries">
+        <h2>Session Entries</h2>
+        {% for entry in entries %}
+        <div class="entry-card">
+            <div class="entry-header">
+                <span class="emotion-level">
+                    <i class="fas fa-circle"
+                        style="{% cycle 'red' 'orange' 'yellow' 'green' 'blue' %}"></i>
+                        Emotion Level: {{ entry.emotion_level }}
+                </span>
+                <span class="entry-date">{{ entry.created_at|date:"F j, Y" }}</span>
+            </div>
+            <div class="entry-content">
+                {{ entry.content|linebreaks }}
+         </div>
+            <div class="entry-reflection">
+                {% if entry.reflection %}
+                <h4>Reflection:</h4>
+                <p>{{ entry.reflection|linebreaks }}</p>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <p>No entries have been added to this session yet.</p>
+        {% endfor %}
+    </div>
+
+    <div class="session-actions">
+        {% if not session.completed %}
+        <a href="{% url 'journal:continue_descent' session.pk %}" class="btn btn-priary">
+            <i class="fas fa-arrow-left"></i> Continue Session
+        </a>
+        {% endif %}
+        <a href="{% url 'journal:journal_history' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to History
+        </a>
+        <a href="{% url 'journal:session_delete' session.pk %}" class="btn btn-danger">
+            <i class="fas fa-trash"></i> Delete Session
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -105,12 +105,9 @@ def admin_dashboard(request):
     """
     Custom admin dashboard with statistic and quick actions
     """
-    if not request.user.is_superuser:
-        messages.error(request, "You don't have permission to access this page.")
-        return redirect('home')
     
     # Get statistics
-    stats = {
+    context = {
         'total_users': User.objects.count(),
         'total_sessions': DescentSession.objects.count(),
         'active_sessions': DescentSession.objects.filter(status__in=['STARTED', 'IN_PROGRESS']).count(),
@@ -119,23 +116,6 @@ def admin_dashboard(request):
         'total_descent_types': DescentType.objects.count()
     }
     
-    # Get recent activity
-    recent_sessions = DescentSession.objects.order_by('-started_at')[:5]
-    recent_entries = Entry.objects.order_by('-timestamp')[:5]
-
-    # Get session statistics by descent type
-    session_stats = DescentType.objects.annotate(
-        session_count=Count('descentsession')
-    ).order_by('-session_count')
-
-    context = {
-        'stats': stats,
-        'recent_sessions': recent_sessions,
-        'recent_entries': recent_entries,
-        'session_stats': session_stats,
-        'descent_types': DescentType.objects.all(),
-        'rituals': Ritual.objects.all()
-    }
     return render(request, 'journal/admin_dashboard.html', context)
 
 @login_required
@@ -155,17 +135,7 @@ def start_descent(request):
             descent_type=descent_type,
             status='STARTED'
         )
-
-        # Get pre-descent rituals
-        pre_rituals = Ritual.objects.filter(type='PRE')
-        during_rituals = Ritual.objects.filter(type='DURING')
-
-        # Redirect to the session page
-        return render(request, 'journal/start_descent.html', {
-            'session': session,
-            'pre_rituals': pre_rituals,
-            'during_rituals': during_rituals
-        })
+        return redirect('journal:continue_descent', pk=session.pk)
     
     descent_types = DescentType.objects.all()
     return render(request, 'journal/start_descent.html', {
@@ -191,79 +161,61 @@ def descent_start(request, pk):
     })
 
 @login_required
-def descent_continue(request, pk):
-    session = get_object_or_404(DescentSession, pk=pk)
+def continue_descent(request, pk):
+    session = get_object_or_404(DescentSession, pk=pk, user=request.user)
 
-    if session.user != request.user:
-        messages.error(request, "You don't have permission to access this session.")
-        return redirect('journal_history')
-    
     if request.method == 'POST':
-        content = request.POST.get('content'),
-        emotion_level = request.POST.get('emotion-level'),
+        content = request.POST.get('content')
+        emotion_level = request.POST.get('emotion-level')
         reflection = request.POST.get('reflection')
 
-        Entry.objects.create(
-            session=session,
-            content=content,
-            emotion_level=emotion_level,
-            reflection=reflection
-        )
+        if not content or not emotion_level:
+            messages.error(request, "Content and emotion level are required.")
+            return redirect('journal:continue_descent', pk=pk)
+        
+        try:
+            emotion_level = int(emotion_level)
+            if emotion_level < 1 or emotion_level > 5:
+                raise ValueError('Invalid emotion level')
 
-        messages.success(request, "Entry add successfully.")
-        return redirect('descent_continue', pk=pk)
+            Entry.objects.create(
+                session=session,
+                content=content,
+                emotion_level=emotion_level,
+                reflection=reflection
+            )
+
+            messages.success(request, "Entry added successfully.")
+            return redirect('journal:continue_descent', pk=pk)
+
+        except (ValueError, TypeError) as e:
+            messages.error(request, 'Invalid emotion level. Please select a number between 1 and 5.')
+            return redirect('journal:continue_descent', pk=pk)
+  
+    pre_rituals = Ritual.objects.filter(descent_type=session.descent_type, type='PRE')
+    during_rituals = Ritual.objects.filter(descent_type=session.descent_type, type='DURING')
     
-    return render(request, 'journal/descent_continue.html', {
-        'session': session
+    return render(request, 'journal/continue_descent.html', {
+        'session': session,
+        'pre_rituals': pre_rituals,
+        'during_rituals': during_rituals
     })
 
 @login_required
 def complete_descent(request, pk):
-    session = get_object_or_404(DescentSession, pk=pk)
-
-    if session.user != request.user:
-        messages.error(request, "You don't have permission to access this session.")
-        return redirect('journal_history')
-    
-    if request.method == 'POST':
-        session.status = 'COMPLETED'
-        session.completed_at = timezone.now()
-        session.save()
-
-        # Get post-descent rituals
-        post_rituals = Ritual.objects.filter(type='POST')
-
-        return render(request, 'journal/descent_complete.html', {
-            'session': session,
-            'post_rituals': post_rituals
-        })
-    
-    return render(request, 'journal/descent_complete.html', {
-        'session': session
-    })
+    session = get_object_or_404(DescentSession, pk=pk, user = request.user)    
+    session.status = 'COMPLETED'
+    session.completed_at = timezone.now()
+    session.save()
+    return redirect('journal:home')
 
 @login_required
 def abandon_descent(request, pk):
-    session = get_object_or_404(DescentSession, pk=pk)
-
-    if session.user != request.user:
-        messages.error(request, "You don't have permission to access this session.")
-        return redirect('journal_history')
-    
-    if request.method == 'POST':
-        session.status = 'ABANDONED'
-        session.completed_at = timezone.now()
-        session.save()
-
-        messages.warning(request, "Descent session abandoned.")
-        return redirect('journal_history')
-    
-    return render(request, 'journal/descent_abandon.html', {
-        'session': session
-    })
-    
-
-
+    session = get_object_or_404(DescentSession, pk=pk, user=request.user)    
+    session.status = 'ABANDONED'
+    session.completed_at = timezone.now()
+    session.save()
+    return redirect('journal:home')
 
 @login_required
 def journal_history(request):
@@ -286,7 +238,8 @@ def descent_type_list(request):
     List all descent types with management options
     """
     if not request.user.is_superuser:
-        return redirect('home')
+        messages.error(request, "You don't have permission to access this page.")
+        return redirect('journal:home')
     
     descent_types = DescentType.objects.all()
     return render(request, 'journal/descent_type_list.html', {
@@ -296,14 +249,15 @@ def descent_type_list(request):
 @login_required
 def descent_type_add(request):
     if not request.user.is_superuser:
-        return redirect('home')
+        messages.error(request, "You don't have permission to add descent types.")
+        return redirect('journal:home')
     
     if request.method == "POST":
         form = DescentTypeForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, 'Descent Type added succesfully.')
-            return redirect('descent_type_list')
+            return redirect('journal:descent_type_list')
     else:
         form = DescentTypeForm()
 
@@ -316,7 +270,8 @@ def descent_type_add(request):
 @login_required
 def descent_type_edit(request, pk):
     if not request.user.is_superuser:
-        return redirect('home')
+        messages.error(request, "You don't have permission to edit descent types.")
+        return redirect('journal:home')
     
     descent_type = get_object_or_404(DescentType, pk=pk)
     
@@ -325,7 +280,7 @@ def descent_type_edit(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, 'Descent Type updated succesfully.')
-            return redirect('descent_type_list')
+            return redirect('journal:descent_type_list')
     else:
         form = DescentTypeForm(instance=descent_type)
 
@@ -338,18 +293,20 @@ def descent_type_edit(request, pk):
 @login_required
 def descent_type_delete(request, pk):
     if not request.user.is_superuser:
-        return redirect('home')
+        messages.error(request, "You don't have permission to edit descent types.")
+        return redirect('journal:home')
     
     descent_type = get_object_or_404(DescentType, pk=pk)
     descent_type.delete()
     messages.success(request, 'Descent Type deleted successfully')
-    return redirect('descent_type_list')
+    return redirect('journal:descent_type_list')
 
 # Ritual Views
 @login_required
 def ritual_list(request):
-    if not request.user.is_superviser:
-        return redirect('home')
+    if not request.user.is_superuser:
+        messages.error(request, "You don't have permission to manage rituals.")
+        return redirect('journal:home')
     
     rituals = Ritual.objects.all()
     return render(request, 'journal/ritual_list.html', {
@@ -359,6 +316,7 @@ def ritual_list(request):
 @login_required
 def ritual_add(request):
     if not request.user.is_superuser:
+        messages.error(request, "You don't have permission to add rituals.")
         return redirect('home')
     
     if request.method == 'POST':
@@ -379,6 +337,7 @@ def ritual_add(request):
 @login_required
 def ritual_edit(request, pk):
     if not request.user.is_superuser:
+        messages.error(request, "You don't have permission to edit rituals.")
         return redirect('home')
     
     ritual = get_object_or_404(Ritual, pk=pk)
@@ -401,11 +360,12 @@ def ritual_edit(request, pk):
 @login_required
 def ritual_delete(request, pk):
     if not request.user.is_superuser:
+        messages.error(request, "You don't have permission to edit sessions.")
         return redirect('home')
     
     ritual = get_object_or_404(Ritual, pk=pk)
     ritual.delete()
-    messages.success(request, 'Ritual updated succcesfully.')
+    messages.success(request, 'Ritual deleted succcesfully.')
     return redirect('ritual_list')
 
 # Session Views
@@ -421,54 +381,70 @@ def session_list(request):
     })
 
 @login_required
+def session_detail(request, pk):
+    session = get_object_or_404(DescentSession, pk=pk, user=request.user)
+
+    # Get all entries for this session
+    entries = Entry.objects.filter(session=session).order_by('timestamp')
+
+    # Get rituals for this session type
+    pre_rituals = Ritual.objects.filter(descent_type=session.descent_type, type='PRE')
+    during_rituals = Ritual.objects.filter(descent_type=session.descent_type, type='DURING')
+
+    context = {
+        'session': session,
+        'entries': entries,
+        'pre_rituals': pre_rituals,
+        'during_rituals': during_rituals
+    }
+
+    return render(request, 'journal/session_detail.html', context)
+
+
+
+@login_required
 def session_edit(request, pk):
     """
     Edit a descent session
     """
     if not request.user.is_superuser:
-        session = get_object_or_404(DescentSession, pk=pk)
+        messages.error(request, "You don't have permission to edit sessions.")
+        return redirect('home')
+    
+    session = get_object_or_404(DescentSession, pk=pk)
         
-        if session.user != request.user:
-            messages.error(request, "You don't have permission to edit this session.")
-            return redirect('journal_history')
-        
-        if request.method == 'POST':
-            session.completed = request.POST.get('completed', False) == 'True'
-            if session.completed:
-                session.completed_at = timezone.now()
-            session.save()
-            messages.success(request, 'Session updated successfully.')
-            return redirect('session_detail', pk=pk)
-            
-        return render(request, 'journal/session_edit.html', {
-            'session': session
-        })
-    
-
-    
-    
     if request.method == 'POST':
-        # Handle session update
-        messages.success(request, 'Session updated successfully.')
-        return redirect('session_list')
+        form = SessionForm(request.POST, instance=session)
+        if form.is_valid:
+            form.save()
+            messages.success(request, 'Session updated successfully.')
+            return redirect('session_list')
     else:
-        return render(request, 'journal/session_edit.html', {
-            'session': session
-        })
+        form = SessionForm(instance=session)
+
+    context = {
+        'form': form,
+        'session': session
+    }        
+    return render(request, 'journal/session_edit.html', context)
     
 @login_required
 def session_delete(request, pk):
-    if not request.user.is_superuser:
-        return redirect('home')
+    session = get_object_or_404(DescentSession, pk=pk, user=request.user)
 
-    session = get_object_or_404(DescentSession, pk=pk)
-    session.delete()
-    messages.success(request, 'Session deleted successfully.')
-    return redirect('session_list')
+    if request.method == 'POST':       
+        session.delete()
+        messages.success(request, 'Session deleted successfully.')
+        return redirect('journal:journal_history')
+    
+    return render(request, 'journal/session_confirm_delete.html', {
+        'session': session
+    })
 
 @login_required
 def user_list(request):
     if not request.user.is_superuser:
+        messages.error(request, "You don't have permission to edit sessions.")
         return redirect('home')
     
     users = User.objects.all()
@@ -479,6 +455,7 @@ def user_list(request):
 @login_required
 def user_edit(request, pk):
     if not request.user.is_superuser:
+        messages.error(request, "You don't have permission to edit users.")
         return redirect('home')
     
     user = get_object_or_404(User, pk=pk)
@@ -512,12 +489,13 @@ def user_edit(request, pk):
 @login_required
 def user_delete(request, pk):
     if not request.user.is_superuser:
+        messages.error(request, "You don't have permission to delete users.")
         return redirect('home')
     
     user = get_object_or_404(User, pk=pk)
 
     # Prevent deleteion of the last Superuser
-    if user.objects.filter(is_superuser=True).count() == 1 and user.is_superuser:
+    if User.objects.filter(is_superuser=True).count() == 1 and user.is_superuser:
         messages.error(request, 'Cannot delete the last superuser')
         return redirect('user_list')
     

@@ -505,6 +505,7 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 1rem;
 }
 
+
 /* Quick Actions */
 .quick-actions {
     margin-top: 3rem;
@@ -616,8 +617,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .action-button.continue {
-    background-color: var(--color-text-secondary);
-    color: var(--color-text-secondary);
+    background-color: var(--color-accent);
+    color: var(--color-text-primary);
+}
+
+.action-button.delete {
+    background-color: var(--color-accent);
+    color: var(--color-text-primary);
 }
 
 .no-sessions {

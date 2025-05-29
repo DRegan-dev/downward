@@ -1,7 +1,7 @@
 <div class="admin-section">
     <h2>Rituals</h2>
     <div class="action-buttons">
-        <a href="{% url 'ritual_add' %}" class="admin-button">
+        <a href="{% url 'journal:ritual_add' %}" class="admin-button">
             <i class="fas fa-plus"></i> Add Ritual
         </a>
     </div>
@@ -22,10 +22,10 @@
                     <td>{{ ritual.get_type_display }}</td>
                     <td>{{ ritual.description }}</td>
                     <td>
-                        <a href="{% url 'ritual_edit' ritual.pk %}" class="action-button edit">
+                        <a href="{% url 'journal:ritual_edit' ritual.pk %}" class="action-button edit">
                             <i class="fas fa-edit"></i>
                         </a>
-                        <a href="{% url 'ritual_delete' ritual.pk %}" class="action-button delete" onclick="return confirm('Are you sure?')">
+                        <a href="{% url 'journal:ritual_delete' ritual.pk %}" class="action-button delete" onclick="return confirm('Are you sure?')">
                             <i class="fas fa-trash"></i>
                         </a>
                     </td>   
