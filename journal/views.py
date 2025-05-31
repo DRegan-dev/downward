@@ -7,6 +7,7 @@ from django.db.models import Count
 from django.utils import timezone
 from .models import DescentType, DescentSession, Entry, Ritual
 from .forms import DescentTypeForm, RitualForm
+from django.views.decorators.http import require_POST, require_http_methods
 from django.contrib.auth.models import User
 import datetime
 
@@ -163,6 +164,7 @@ def descent_start(request, pk):
 @login_required
 def continue_descent(request, pk):
     session = get_object_or_404(DescentSession, pk=pk, user=request.user)
+    entries = Entry.objects.filter(session=session).order_by('timestamp')
 
     if request.method == 'POST':
         content = request.POST.get('content')
@@ -197,6 +199,7 @@ def continue_descent(request, pk):
     
     return render(request, 'journal/continue_descent.html', {
         'session': session,
+        'entries': entries,
         'pre_rituals': pre_rituals,
         'during_rituals': during_rituals
     })
@@ -218,18 +221,73 @@ def abandon_descent(request, pk):
     return redirect('journal:home')
 
 @login_required
+@require_POST
+def add_entry(request, session_id):
+    session = get_object_or_404(DescentSession, pk=session_id, user=request.user)
+
+    content = request.POST.get('content')
+    reflection = request.POST.get('reflection')
+    emotion_level = request.POST.get('emotion_level')
+
+    if not content or not emotion_level:
+        return JsonResponse({'success': False, 'error': 'Content and emotion level are required'})
+    
+    try:
+        emotion_level = int(emotion_level)
+        if emotion_level < 1 or emotion_level > 5:
+            return JsonResponse({'success': False, 'error': 'Invalid eotion level'})
+        
+        Entry.objects.create(
+            session=session,
+            content=content,
+            emotion_level=emotion_level,
+            reflection=reflection
+        )
+        return JsonResponse({'success': True})
+    
+    except (ValueError, TypeError):
+        return JsonResponse({'success': False, 'error': ' Invalid emotion level'})
+    
+@login_required
+@require_POST
+def edit_entry(request, entry_id):
+    entry = get_object_or_404(Entry, pk=entry_id, session__user=request.user)
+
+    content = request.POST.get('content')
+    reflection = request.POST.get('reflection')
+    emotion_level = request.POST.get('emotion_level')
+
+    if content:
+        entry.content = content
+    if reflection:
+        entry.reflection = reflection
+    if emotion_level:
+        try:
+            emotion_level = int(emotion_level)
+            if emotion_level < 1 or emotion_level > 5:
+                return JsonResponse({'success': False, 'error': 'Invalid emotion level'})
+            entry.emotion_level = emotion_level
+        except (ValueError, TypeError):
+            return JsonResponse({{"success": False, 'error': 'Invalid emotion level'}})
+        
+    entry.save()
+    return JsonResponse({'sucess': True})
+
+@login_required
+@require_POST
+def delete_entry(request, entry_id):
+    entry = get_object_or_404(Entry, pk=entry_id, session__user=request.user)
+    entry.delete()
+    return JsonResponse({{'success': True}})
+
+@login_required
 def journal_history(request):
     """
     Display User's descent history
     """
     # Get all sessions for the current user
     sessions = DescentSession.objects.filter(user=request.user).order_by('-started_at')
-
-    context = {
-        'sessions': sessions,
-        'descent_types': DescentType.objects.all()
-    }
-    return render(request, 'journal/journal_history.html', context)
+    return render(request, 'journal/journal_history.html', {'sessions': sessions})
 
 # Descent Type Views
 @login_required
@@ -437,9 +495,11 @@ def session_delete(request, pk):
         messages.success(request, 'Session deleted successfully.')
         return redirect('journal:journal_history')
     
-    return render(request, 'journal/session_confirm_delete.html', {
-        'session': session
-    })
+    context = {
+        'session': session,
+    }
+    
+    return render(request, 'journal/session_confirm_delete.html', context)
 
 @login_required
 def user_list(request):

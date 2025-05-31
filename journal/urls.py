@@ -32,6 +32,10 @@ urlpatterns = [
     path('admin/ritual/<int:pk>/delete/', views.ritual_delete, name='ritual_delete'),
 
     # Session functionality
-    path('session<int:pk>/', views.session_detail, name='session_detail'),
-    path('session/<int:pk>/delete/', views.session_delete, name='session_delete'),
+    path('session/<int:pk>/', views.session_detail, name='session_detail'),
+    path('session/<int:pk>/delete/', views.session_delete, name='session_delete'),  
+    path('session/<int:pk>/continue/', views.continue_descent, name='session_continue'),
+    path('session/<int:pk>/add_entry/', views.add_entry, name='add_entry'),
+    path('entry/<int:entry_id>/edit/', views.edit_entry, name='edit_entry'),
+    path('entry/<int:entry_id>/delete/', views.delete_entry, name='delete_entry'),
 ]

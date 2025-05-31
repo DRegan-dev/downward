@@ -22,42 +22,72 @@
     </div>
 
     <!-- Session List -->
+    {% if sessions %}
     <div class="session-list">
         {% for session in sessions %}
         <div class="session-card">
             <div class="session-header">
-                <h3>{{ session.descent_type.name }}</h3>
-                <p class="session-date">{{ session.started_at|date:"F j, Y" }}</p>
+                <h2>{{ session.descent_type.name }}</h2>
+                <div class="session-meta">
+                    <span><i class="fas fa-clock"></i> {{ session.started_at|date:"F j, Y" }} </span>
+                    {% if session.completed_at %}
+                        <span class="text-success"><i class="fas fa-check"></i> Completed</span>
+                        <span><i class="fas fa-clock"></i> Duration: {{ session.completed_at|timesince:session.started_at }}</span>
+                    {% else %}
+                        <span class="text-warning"><i class="fas fa-circle"></i> In Progress</span>
+                    {% endif %}
+                </div>
             </div>
 
-            <div class="session-info">
-                <p class="session-duration">
-                    <i class="fas fa-clock"></i>
-                    Duration: {{ session.completed_at|timesince:session.started_at }}
-                </p>
-                <p class="session-session">
-                    <i class="fas {% if session.completed %}fa-check-circle text-success{% else %}fa-circle  text-warning{% endif %}"></i>
-                    {% if session.completed %}Completed{% else %}In Progress{% endif %}
-                </p>
-            </div>
+            <div class="session-content">
+                <div class="session-actions">
+                    {% if not session.completed %}
+                    <a href="{% url 'journal:session_continue' pk=session.pk %}" class="btn btn-success">
+                        <i class="fas fa-play"></i> Continue
+                    </a>
+                    {% endif %}
+                </div>
+                    <a href="{% url 'journal:session_detail' pk=session.pk %}" class="btn btn-primary">
+                        <i class="fas fa-eye"></i> View Details
+                    </a>
+                    <a href="{% url 'journal:session_delete' pk=session.pk %}" class="btn btn-primary">
+                        <i class="fas fa-trash "></i> Delete
+                    </a>
+                    
+            
 
-            <div class="session-actions">
-                {% if not session.completed %}
-                <a href="{% url 'journal:continue_descent' session.pk %}" class="action-button continue">
-                    <i class="fas fa-play"></i> Continue 
-                </a>
-                {% endif %}
-                <a href="{% url 'journal:session_detail' session.pk %}" class="action-button view">
-                    <i class="fas fa-eye"></i> View 
-                </a>
-                <a href="{% url 'journal:session_delete' session.pk %}" class="action-button delete">
-                    <i class="fas fa-trash"></i> Delete
-                </a>
+                <div class="session-entries">
+                    <h3>Latest Entry</h3>
+                    {% with session.entry_set.first as latest_entry %}
+                    {% if latest_entry %}
+                     <div class="entry-preview">
+                        <div class="entry-header">
+                            <span class="emotion-level">
+                               <i class="fas fa-circle" style="color: {% cycle 'red' 'orange' 'yellow' 'green' 'blue' %};"></i>
+                               Emotion Level: {{ latest_entry.emotion_level}}
+                            </span>
+                        </div>
+                        <div class="entry-content">
+                            {{ latest_entry.content|truncatewords:30|linebreaks }}
+                        </div>
+                        {% if latest_entry.reflection %}
+                        <div class="entry-reflection">
+                           <h4>Reflection:</h4>
+                           <p>{{ latest_entry.reflection|truncatewords:20|linebreaks }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <p> No entries yet</p>
+                    {% endif %}
+                    {% endwith %}
+                </div>
             </div>
-        </div>
-        {% empty %}
-        <p class="no-sessions">No descent sessions found.</p>
-        {% endfor %}
+        </div>  
+        {% endfor %}      
     </div>
+    {% else %}
+    <p class="no-sessions">No Descent sessions found in your history.</p>
+    {% endif %}
 </div>
 {% endblock %}

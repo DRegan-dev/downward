@@ -8,7 +8,7 @@
         <p><i class="fas fa-clock"></i> Started: {{ session.started_at }}</p>
         {% if session.completed_at %}
             <p><i class="fas fa-check"></i> Completed: {{ session.completed_at }}</p>
-            <p><i class="fas fa-clock"></i> Duration: {{ session.complete_at|timesince:session.started_at }}</p>
+            <p><i class="fas fa-clock"></i> Duration: {{ session.completed_at|timesince:session.started_at }}</p>
         {% endif %}
     </div>
 
@@ -65,8 +65,12 @@
 
     <div class="session-actions">
         {% if not session.completed %}
-        <a href="{% url 'journal:continue_descent' session.pk %}" class="btn btn-priary">
+        <a href="{% url 'journal:continue_descent' session.pk %}" class="btn btn-prmiary">
             <i class="fas fa-arrow-left"></i> Continue Session
+        </a>
+        {% else %}
+        <a href="{% url 'journal:edit_session' session.pk %}" class="btn btn-success">
+            <i class="fas fa-edit"></i> Edit Session
         </a>
         {% endif %}
         <a href="{% url 'journal:journal_history' %}" class="btn btn-secondary">

@@ -16,7 +16,7 @@
 </head>
 <body>
     <!-- Navigation -->
-     <header class="main-header">
+    <header class="main-header">
         <nav class="main-navigation">
             <div class="logo">
                 <a href="{% url 'journal:home' %}">Downward</a>
@@ -47,17 +47,17 @@
                 {% endif %}
             </ul>
         </nav>
-     </header>
+    </header>
 
      <!-- Main Content Area -->
 
-     <main class="site-content">
+    <main class="site-content">
         {% block content %}
         {% endblock %}
-     </main>
+    </main>
 
      <!--Footer-->
-     <footer class="site-footer">
+    <footer class="site-footer">
         <div class="footer-content">
             <p>&copy; {% now "Y" %} Downward. A space for descent.</p>
             <nav class="footer-links">
@@ -66,10 +66,12 @@
                 <a href="{% url 'journal:terms' %}">Terms</a>
             </nav>
         </div>
-     </footer>
+    </footer>
 
      <!-- Javascript -->
-      <script src="{% static '/js/main.js' %}" ></script>
+    <script src="{% static '/js/main.js' %}" ></script>
+     {% block extra_js %}
+     {% endblock %}
     
 </body>
 </html>
