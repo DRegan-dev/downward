@@ -168,7 +168,7 @@ def continue_descent(request, pk):
 
     if request.method == 'POST':
         content = request.POST.get('content')
-        emotion_level = request.POST.get('emotion-level')
+        emotion_level = request.POST.get('emotion_level')
         reflection = request.POST.get('reflection')
 
         if not content or not emotion_level:
@@ -188,7 +188,7 @@ def continue_descent(request, pk):
             )
 
             messages.success(request, "Entry added successfully.")
-            return redirect('journal:continue_descent', pk=pk)
+            return redirect('journal:complete_descent', pk=pk)
 
         except (ValueError, TypeError) as e:
             messages.error(request, 'Invalid emotion level. Please select a number between 1 and 5.')
@@ -206,7 +206,7 @@ def continue_descent(request, pk):
 
 @login_required
 def complete_descent(request, pk):
-    session = get_object_or_404(DescentSession, pk=pk, user = request.user)    
+    session = get_object_or_404(DescentSession, pk=pk, user=request.user)    
     session.status = 'COMPLETED'
     session.completed_at = timezone.now()
     session.save()
@@ -249,29 +249,39 @@ def add_entry(request, session_id):
         return JsonResponse({'success': False, 'error': ' Invalid emotion level'})
     
 @login_required
-@require_POST
 def edit_entry(request, entry_id):
-    entry = get_object_or_404(Entry, pk=entry_id, session__user=request.user)
+    entry = get_object_or_404(Entry, id=entry_id, session__user=request.user)
 
-    content = request.POST.get('content')
-    reflection = request.POST.get('reflection')
-    emotion_level = request.POST.get('emotion_level')
+    if request.method == 'POST':
+        content = request.POST.get('content')
+        reflection = request.POST.get('reflection')
+        emotion_level = request.POST.get('emotion_level')
 
-    if content:
-        entry.content = content
-    if reflection:
-        entry.reflection = reflection
-    if emotion_level:
+        if not content or not emotion_level:
+            messages.error(request, 'Content and emotion level are required.')
+            return redirect('Journal:edit_entry', entry_id=entry_id)
+    
         try:
             emotion_level = int(emotion_level)
             if emotion_level < 1 or emotion_level > 5:
-                return JsonResponse({'success': False, 'error': 'Invalid emotion level'})
-            entry.emotion_level = emotion_level
-        except (ValueError, TypeError):
-            return JsonResponse({{"success": False, 'error': 'Invalid emotion level'}})
+                raise ValueError('Invalid emotion level')
         
-    entry.save()
-    return JsonResponse({'sucess': True})
+            entry.content = content
+            entry.emotion_level = emotion_level
+            entry.reflection = reflection
+            entry.save()
+
+            messages.success(request, 'Entry updated successfully.')
+            return redirect('journal:session_detail', pk=entry.session.pk)
+    
+        except (ValueError, TypeError):
+            messages.error(request, "Invalid emotion level")
+            return redirect('journal:edit_entry', entry_id=entry_id)
+    
+    return render(request, 'journal/edit_entry.html', {
+        'entry': entry,
+        'emotion_levels': range(1, 6)
+    })
 
 @login_required
 @require_POST
@@ -286,7 +296,7 @@ def journal_history(request):
     Display User's descent history
     """
     # Get all sessions for the current user
-    sessions = DescentSession.objects.filter(user=request.user).order_by('-started_at')
+    sessions = DescentSession.objects.prefetch_related('entries').filter(user=request.user).order_by('-started_at')
     return render(request, 'journal/journal_history.html', {'sessions': sessions})
 
 # Descent Type Views

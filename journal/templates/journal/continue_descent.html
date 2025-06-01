@@ -62,9 +62,12 @@
         </div>
 
         <div class="action-buttons">
-            <a href="{% url 'journal:complete_descent' session.pk %}" class="btn btn-primary">
+            <button type="submit" name="action" class="action-button">
                 <i class="fas fa-save"></i> Complete Session
-            </a>
+            </button>
+            <button type="submit" name="action" class="action-button">
+                <i class="fas fa-plus"></i> Save Progress
+            </button>
             <a href="{% url 'journal:abandon_descent' session.pk %}" class="btn btn-danger">
                 <i class="fas fa-times"></i> Abandon
             </a>

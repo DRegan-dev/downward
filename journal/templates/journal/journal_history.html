@@ -30,7 +30,7 @@
                 <h2>{{ session.descent_type.name }}</h2>
                 <div class="session-meta">
                     <span><i class="fas fa-clock"></i> {{ session.started_at|date:"F j, Y" }} </span>
-                    {% if session.completed_at %}
+                    {% if session.completed_at and session.entries.exists %}
                         <span class="text-success"><i class="fas fa-check"></i> Completed</span>
                         <span><i class="fas fa-clock"></i> Duration: {{ session.completed_at|timesince:session.started_at }}</span>
                     {% else %}
@@ -41,7 +41,7 @@
 
             <div class="session-content">
                 <div class="session-actions">
-                    {% if not session.completed %}
+                    {% if not session.completed_at or not session.entries.exists %}
                     <a href="{% url 'journal:session_continue' pk=session.pk %}" class="btn btn-success">
                         <i class="fas fa-play"></i> Continue
                     </a>
@@ -58,7 +58,7 @@
 
                 <div class="session-entries">
                     <h3>Latest Entry</h3>
-                    {% with session.entry_set.first as latest_entry %}
+                    {% with session.entries.first as latest_entry %}
                     {% if latest_entry %}
                      <div class="entry-preview">
                         <div class="entry-header">
