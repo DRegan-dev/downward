@@ -43,7 +43,7 @@
                 <div class="session-actions">
                     {% if not session.completed_at or not session.entries.exists %}
                     <a href="{% url 'journal:session_continue' pk=session.pk %}" class="btn btn-success">
-                        <i class="fas fa-play"></i> Continue
+                        <i class="fas fa-play"></i> Start Over
                     </a>
                     {% endif %}
                 </div>

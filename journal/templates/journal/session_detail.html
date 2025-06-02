@@ -41,10 +41,10 @@
 
     <div class="session-actions">
         {% if not session.completed %}
-        <!-- <a href="{% url 'journal:continue_descent' session.pk %}" class="action-button delete">
-            <i class="fas fa-arrow-left"></i> Continue Session
-        </a> -->
-        
+        <a href="{% url 'journal:continue_descent' session.pk %}" class="action-button delete">
+            <i class="fas fa-arrow-left"></i> Start Over
+        </a>
+        {% else %}
         <a href="{% url 'journal:edit_session' session.pk %}" class="action-button delete">
             <i class="fas fa-edit"></i> Edit Session
         </a>
