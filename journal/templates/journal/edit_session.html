@@ -45,11 +45,6 @@
                 <button type="submit" name="action" class="action-button">
                     <i class="fas fa-save"></i> Save Changes
                 </button>
-                {% if not session.completed_at or not session.entries.exists %}
-                <button type="submit" name="action" value="complete" class="action-button">
-                    <i class="fas fa-save"></i> Complete Session
-                </button>
-                {% endif %}
                 <a href="{% url 'journal:home' %}" class="btn btn-danger">
                     <i class="fas fa-times"></i> Back to Journal
                 </a>
