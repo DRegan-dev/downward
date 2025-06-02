@@ -48,6 +48,10 @@
         <a href="{% url 'journal:edit_session' session.pk %}" class="action-button delete">
             <i class="fas fa-edit"></i> Edit Session
         </a>
+
+        <button type="submit" name="action" value="complete" class="action-button">
+            <i class="fas fa-save"></i> Complete Session
+        </button>
         {% endif %}
         <a href="{% url 'journal:journal_history' %}" class="action-button delete">
             <i class="fas fa-arrow-left"></i> Back to History
