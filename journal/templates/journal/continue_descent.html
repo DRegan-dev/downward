@@ -58,45 +58,19 @@
                     <label for="reflection">Reflection (optional)</label>
                     <textarea name="reflection" id="reflection" class="form-control" rows="4"></textarea>
                 </div>
+                <div class="action-buttons">
+                    <button type="submit" name="action" value="complete" class="action-button">
+                        <i class="fas fa-save"></i> Complete Session
+                    </button>
+                    <button type="submit" name="action" value="save_progress" class="action-button">
+                        <i class="fas fa-plus"></i> Save Progress
+                    </button>
+                    <a href="{% url 'journal:abandon_descent' session.pk %}" class="btn btn-danger">
+                        <i class="fas fa-times"></i> Abandon
+                    </a>
+                </div>
             </form>
-        </div>
-
-        <div class="action-buttons">
-            <button type="submit" name="action" class="action-button">
-                <i class="fas fa-save"></i> Complete Session
-            </button>
-            <button type="submit" name="action" class="action-button">
-                <i class="fas fa-plus"></i> Save Progress
-            </button>
-            <a href="{% url 'journal:abandon_descent' session.pk %}" class="btn btn-danger">
-                <i class="fas fa-times"></i> Abandon
-            </a>
         </div>
     </div>
 {% endblock %}
 
-{% block extra_js %}
-$(document).ready(function() {
-    $('#newEntryForm').on('submit', function(e) {
-        e.preventDefault();
-        const formData =$(this).serialize();
-        
-        $.ajax({
-            url: '{% url "journal:add_entry" session.pk %}',
-            type: 'POST',
-            data: formData,
-            success: function(response) {
-                if (response.success) {
-                    loacation.reload();
-                } else {
-                    alert('Error: ' + response.error);
-                }
-            },
-            error: function() {
-                alert('An error occurred while adding the entry.');
-            }
-        });
-    });
-});
-{% endblock %}
-        

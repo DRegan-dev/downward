@@ -12,30 +12,6 @@
         {% endif %}
     </div>
 
-    <div class="rituals">
-        <h2>Pre-Descent Rituals</h2>
-        <div class="ritual-list">
-            {% for ritual in pre_rituals %}
-            <div class="ritual-card">
-                <h3>{{ ritual.name }}</h3>
-                <p>{{ ritual.description }}</p>
-                <div class="instructions">{{ ritual.instructions }}</div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-
-    <h2>During Descent Rituals</h2>
-    <div class="ritual-list">
-        {% for ritual in during_rituals %}
-        <div class="ritual-card">
-            <h3>{{ ritual.name }}</h3>
-            <p>{{ ritual.description }}</p>
-            <div class="instructions">{{ ritual.instructions }}</div>
-        </div>
-        {% endfor %}
-    </div>   
-
     <div class="entries">
         <h2>Session Entries</h2>
         {% for entry in entries %}
@@ -57,11 +33,6 @@
                 <p>{{ entry.reflection|linebreaks }}</p>
             </div>
             {% endif %}
-            <div class="entry-actions">
-                <a href="{% url 'journal:edit_entry' entry.id %}">
-                    <i class="fas fa-edit"></i> Edit
-                </a>
-            </div>
         </div>
         {% empty %}
         <p>No entries have been added to this session yet.</p>
@@ -70,15 +41,15 @@
 
     <div class="session-actions">
         {% if not session.completed %}
-        <a href="{% url 'journal:continue_descent' session.pk %}" class="action-button">
+        <a href="{% url 'journal:continue_descent' session.pk %}" class="action-button delete">
             <i class="fas fa-arrow-left"></i> Continue Session
         </a>
         {% else %}
-        <a href="{% url 'journal:edit_session' session.pk %}" class="action-button">
+        <a href="{% url 'journal:edit_session' session.pk %}" class="action-button delete">
             <i class="fas fa-edit"></i> Edit Session
         </a>
         {% endif %}
-        <a href="{% url 'journal:journal_history' %}" class="action-button">
+        <a href="{% url 'journal:journal_history' %}" class="action-button delete">
             <i class="fas fa-arrow-left"></i> Back to History
         </a>
         <a href="{% url 'journal:session_delete' session.pk %}" class="action-button delete">

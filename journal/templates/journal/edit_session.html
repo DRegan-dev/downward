@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="continue-container">
+    <div class="session_header">
+        <h1>Descent Session: {{ session.descent_type.name}}</h1>
+    </div>
+
+    <div class="entry-form">
+        <h2>Edit Your Descent Entries</h2>
+        <form method="post" action="{% url 'journal:edit_session' pk=session.pk %}">
+            {% csrf_token %}
+
+            {% for entry in entries %}
+            <div class="entry-edit-section">
+                <h3>Entry {{ forloop.counter }} - {{ entry.timestamp|date:"M d, g:i A" }}</h3>
+                
+                div class="form-group">
+                        <label for="content_{{ entry_id }}">Content</label>
+                        <textarea name="content_{{ entry.id }}" id="content_{{ entry.id }}" class="form-control" rows="4" required>{{ entry.content }}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="emotion_level_{{ entry.id }}">Emotion Level</label>
+                    <select name="emotion_level_{{ entry.id }}" id="emotion_level_{{ entry.id }}" class="form-control" required>
+                        <option value="">Select emotion level</option>
+                        <option value="1" {% if entry.emotion_level == 1 %}selected{% endif %}>Very Low</option>
+                        <option value="2" {% if entry.emotion_level == 2 %}selected{% endif %}>Low</option>
+                        <option value="3" {% if entry.emotion_level == 3 %}selected{% endif %}>Neutral</option>
+                        <option value="4" {% if entry.emotion_level == 4 %}selected{% endif %}>High</option>
+                        <option value="5" {% if entry.emotion_level == 5 %}selected{% endif %}>Very High</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="reflection_{{ entry.id }}">Reflection (optional)</label>
+                    <textarea name="reflection_{{ entry.id }}" id="reflection_{{ entry.id }}" class="form-control" rows="4">{{ entry.reflection }}</textarea>
+                </div>
+
+                {% if not forloop.last %}
+                <hr>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <div class="action-buttons">
+                <button type="submit" name="action" class="action-button">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+                <a href="{% url 'journal:home' %}" class="btn btn-danger">
+                    <i class="fas fa-times"></i> Back to Journal
+                </a>
+                <a href="{% url 'journal:abandon_descent' session.pk %}" class="btn btn-danger">
+                    <i class="fas fa-times"></i> Cancel Edit
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

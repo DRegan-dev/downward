@@ -167,11 +167,21 @@ def continue_descent(request, pk):
     entries = Entry.objects.filter(session=session).order_by('timestamp')
 
     if request.method == 'POST':
+        print(f'POST request received!')
+        print(f'POST data: {dict(request.POST)}')
+
+
         content = request.POST.get('content')
         emotion_level = request.POST.get('emotion_level')
         reflection = request.POST.get('reflection')
+        action = request.POST.get('action')
+
+        print(f"Content: '{content}' (length: {len(content) if content else 0})")
+        print(f"Action: '{action}'")
+
 
         if not content or not emotion_level:
+            print('Validation failed')
             messages.error(request, "Content and emotion level are required.")
             return redirect('journal:continue_descent', pk=pk)
         
@@ -184,25 +194,61 @@ def continue_descent(request, pk):
                 session=session,
                 content=content,
                 emotion_level=emotion_level,
-                reflection=reflection
+                reflection=reflection,
             )
 
-            messages.success(request, "Entry added successfully.")
-            return redirect('journal:complete_descent', pk=pk)
+            if action == 'complete':
+                session.status = 'COMPLETED'
+                session.completed_at = timezone.now()
+                session.save()
+                messages.success(request, 'Session completed successfully!')
+                return redirect('journal:complete_descent', pk=pk)
+            
+            elif action == 'save_progress':
+                session.status = 'IN_PROGRESS'
+                session.save()
+                messages.success(request, "Entry added successfully. Continue your descent.")
+                return redirect('journal:journal_history')
 
+            else:
+                messages.success(request, "Entry added successfully.")
+                return redirect('journal:complete_descent', pk=pk)
+            
         except (ValueError, TypeError) as e:
             messages.error(request, 'Invalid emotion level. Please select a number between 1 and 5.')
             return redirect('journal:continue_descent', pk=pk)
-  
-    pre_rituals = Ritual.objects.filter(descent_type=session.descent_type, type='PRE')
-    during_rituals = Ritual.objects.filter(descent_type=session.descent_type, type='DURING')
     
     return render(request, 'journal/continue_descent.html', {
         'session': session,
         'entries': entries,
-        'pre_rituals': pre_rituals,
-        'during_rituals': during_rituals
     })
+
+@login_required
+def edit_session(request, pk):
+    session = get_object_or_404(DescentSession, pk=pk, user=request.user)
+    entries = Entry.objects.filter(session=session).order_by('timestamp')
+
+    if request.method == 'POST':
+        # hANDLE Individual entry updates
+        for entry in entries:
+            content_key = f'content_{entry.id}'
+            emotion_key = f'emotion_level_{entry.id}'
+            reflection_key = f'reflection_{entry.id}'
+
+            if content_key in request.POST:
+                entry.content = request.POST[content_key]
+                entry.emotion_level = request.POST[emotion_key]
+                entry.reflection = request.POST[reflection_key]
+                entry.save()
+
+        messages.success(request, "Session updated successfully!") 
+        return redirect('journal:session_detail', pk =pk)
+    
+    return render(request, 'journal/edit_session.html', {
+        'session': session,
+        'entries': entries,
+    })
+
 
 @login_required
 def complete_descent(request, pk):
@@ -310,7 +356,7 @@ def descent_type_list(request):
         return redirect('journal:home')
     
     descent_types = DescentType.objects.all()
-    return render(request, 'journal/descent_type_list.html', {
+    return render(request, 'journal/includes/descent_type_list.html', {
         'descent_types': descent_types
     })
 
@@ -325,7 +371,7 @@ def descent_type_add(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Descent Type added succesfully.')
-            return redirect('journal:descent_type_list')
+            return redirect('journal:admin_dashboard')
     else:
         form = DescentTypeForm()
 
@@ -348,7 +394,7 @@ def descent_type_edit(request, pk):
         if form.is_valid():
             form.save()
             messages.success(request, 'Descent Type updated succesfully.')
-            return redirect('journal:descent_type_list')
+            return redirect('journal:admin_dashboard')
     else:
         form = DescentTypeForm(instance=descent_type)
 
@@ -367,7 +413,7 @@ def descent_type_delete(request, pk):
     descent_type = get_object_or_404(DescentType, pk=pk)
     descent_type.delete()
     messages.success(request, 'Descent Type deleted successfully')
-    return redirect('journal:descent_type_list')
+    return redirect('journal:admin_dashboard')
 
 # Ritual Views
 @login_required

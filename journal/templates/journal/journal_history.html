@@ -50,6 +50,11 @@
                     <a href="{% url 'journal:session_detail' pk=session.pk %}" class="btn btn-primary">
                         <i class="fas fa-eye"></i> View Details
                     </a>
+
+                    <a href="{% url 'journal:edit_session' session.pk %}" class="btn btn-primary">
+                        <i class="fas fa-edit"></i> Edit Session
+                    </a>
+
                     <a href="{% url 'journal:session_delete' pk=session.pk %}" class="btn btn-primary">
                         <i class="fas fa-trash "></i> Delete
                     </a>
