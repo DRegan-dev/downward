@@ -14,8 +14,8 @@ class DescentType(models.Model):
 
     name = models.CharField(max_length=100)
     description = models.TextField()
-    type = models.CharField(max_length=20, choices=TYPE_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True)
+    type = models.CharField(max_length=50, choices=TYPE_CHOICES, default='EMOTIONAL')
     
     def __str__(self):
         return self.name
@@ -35,7 +35,7 @@ class DescentSession(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     descent_type = models.ForeignKey(DescentType, on_delete=models.CASCADE)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='STARTED')
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='STARTED')
     started_at = models.DateTimeField(auto_now_add=True)
     completed_at = models.DateTimeField(null=True, blank=True)
     abandoned_at = models.DateTimeField(null=True, blank=True)
@@ -62,19 +62,3 @@ class Entry(models.Model):
     def __str__(self):
         return f"Entry for {self.session}"
     
-class Ritual(models.Model):
-    TYPE_CHOICES = [
-        ('PRE', 'Pre-Descent'),
-        ('DURING', 'During Descent'),
-        ('POST', 'Post-Descent')
-    ]
-
-    name = models.CharField(max_length=100)
-    description = models.TextField()
-    type = models.CharField(max_length=20, choices=TYPE_CHOICES)
-    instructions = models.TextField()
-    descent_type = models.ForeignKey(DescentType, on_delete=models.CASCADE, related_name='rituals', default=1)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.name

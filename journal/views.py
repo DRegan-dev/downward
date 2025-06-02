@@ -5,8 +5,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Count
 from django.utils import timezone
-from .models import DescentType, DescentSession, Entry, Ritual
-from .forms import DescentTypeForm, RitualForm
+from .models import DescentType, DescentSession, Entry 
+from .forms import DescentTypeForm
 from django.views.decorators.http import require_POST, require_http_methods
 from django.contrib.auth.models import User
 import datetime
@@ -113,7 +113,6 @@ def admin_dashboard(request):
         'total_sessions': DescentSession.objects.count(),
         'active_sessions': DescentSession.objects.filter(status__in=['STARTED', 'IN_PROGRESS']).count(),
         'total_entries': Entry.objects.count(),
-        'total_rituals': Ritual.objects.count(),
         'total_descent_types': DescentType.objects.count()
     }
     
@@ -153,12 +152,9 @@ def descent_start(request, pk):
         messages.error(request, "You don't have permission to access this session.")
         return redirect('journal_history')
     
-    # Get during-descent rituals
-    during_rituals = Ritual.objects.filter(type='DURING')
 
     return render(request, 'journal/descent_start.html', {
         'session': session,
-        'during_rituals': during_rituals
     })
 
 @login_required
@@ -415,73 +411,6 @@ def descent_type_delete(request, pk):
     messages.success(request, 'Descent Type deleted successfully')
     return redirect('journal:admin_dashboard')
 
-# Ritual Views
-@login_required
-def ritual_list(request):
-    if not request.user.is_superuser:
-        messages.error(request, "You don't have permission to manage rituals.")
-        return redirect('journal:home')
-    
-    rituals = Ritual.objects.all()
-    return render(request, 'journal/ritual_list.html', {
-        'rituals': rituals
-    })
-
-@login_required
-def ritual_add(request):
-    if not request.user.is_superuser:
-        messages.error(request, "You don't have permission to add rituals.")
-        return redirect('home')
-    
-    if request.method == 'POST':
-        form = RitualForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Ritual added succesfully.')
-            return redirect('ritual_list')
-    else:
-        form = RitualForm()
-
-    return render(request, 'journal/includes/form.html', {
-        'form':  form,
-        'title': 'Add Ritual',
-        'action': 'Add'
-    })    
-    
-@login_required
-def ritual_edit(request, pk):
-    if not request.user.is_superuser:
-        messages.error(request, "You don't have permission to edit rituals.")
-        return redirect('home')
-    
-    ritual = get_object_or_404(Ritual, pk=pk)
-    
-    if request.method == 'POST':
-        form = RitualForm(request.POST, instance=ritual)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Ritual updated succesfully.')
-            return redirect('ritual_list')
-    else:
-        form = RitualForm(instance=ritual)
-
-    return render(request, 'journal/includes/form.html', {
-        'form':  form,
-        'title': 'Edit Ritual',
-        'action': 'Update'
-    })  
-
-@login_required
-def ritual_delete(request, pk):
-    if not request.user.is_superuser:
-        messages.error(request, "You don't have permission to edit sessions.")
-        return redirect('home')
-    
-    ritual = get_object_or_404(Ritual, pk=pk)
-    ritual.delete()
-    messages.success(request, 'Ritual deleted succcesfully.')
-    return redirect('ritual_list')
-
 # Session Views
 
 @login_required
@@ -501,15 +430,9 @@ def session_detail(request, pk):
     # Get all entries for this session
     entries = Entry.objects.filter(session=session).order_by('timestamp')
 
-    # Get rituals for this session type
-    pre_rituals = Ritual.objects.filter(descent_type=session.descent_type, type='PRE')
-    during_rituals = Ritual.objects.filter(descent_type=session.descent_type, type='DURING')
-
     context = {
         'session': session,
         'entries': entries,
-        'pre_rituals': pre_rituals,
-        'during_rituals': during_rituals
     }
 
     return render(request, 'journal/session_detail.html', context)

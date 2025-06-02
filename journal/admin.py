@@ -1,11 +1,11 @@
 from django.contrib import admin
-from .models import DescentType, DescentSession, Entry, Ritual
+from .models import DescentType, DescentSession, Entry
 
 # Register your models here.
 @admin.register(DescentType)
 class DescentTypeAdmin(admin.ModelAdmin):
     list_display = ('name', 'description', 'created_at')
-    list_filter = ('type', 'created_at')
+    # list_filter = ('type', 'created_at')
     search_fields = ('name', 'description')
     ordering = ('name',)
     fieldsets = (
@@ -67,10 +67,4 @@ class EntryAdmin(admin.ModelAdmin):
     )
     readonly_fields = ('timestamp',)
 
-@admin.register(Ritual)
-class RitualAdmin(admin.ModelAdmin):
-    list_display = ('name', 'type', 'created_at')
-    list_filter = ('type', 'created_at')
-    search_fields = ('name', 'description', 'instructions')
-    ordering = ('name',)
-    readonly_fields = ('created_at',)
+

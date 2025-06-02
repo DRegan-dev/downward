@@ -29,6 +29,7 @@ def login_view(request):
     else:
         form = UserLoginForm()
     return render(request, 'accounts/login.html', {'form': form})
+
 @login_required    
 def logout_view(request):
     logout(request)

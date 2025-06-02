@@ -1,5 +1,5 @@
 from django import template
-from journal.models import DescentType, Ritual, DescentSession, Entry
+from journal.models import DescentType, DescentSession, Entry
 from django.utils import timezone
 from django.contrib.auth.models import User
 
@@ -10,10 +10,6 @@ def render_descent_type_list():
     descent_types = DescentType.objects.all()
     return {'descent_types': descent_types}
 
-@register.inclusion_tag('journal/includes/ritual_list.html')
-def render_ritual_list():
-    rituals = Ritual.objects.all()
-    return {'rituals': rituals}
 
 @register.inclusion_tag('journal/includes/session_list.html')
 def render_session_list():

@@ -26,11 +26,6 @@ urlpatterns = [
     path('admin/descent-type/<int:pk>/edit/', views.descent_type_edit, name='descent_type_edit'),
     path('admin/descent-type/<int:pk>/delete/', views.descent_type_delete, name='descent_type_delete'),
 
-    # Ritual Management
-    path('admin/ritual/add/', views.ritual_add, name='ritual_add'),
-    path('admin/ritual/<int:pk>/edit/', views.ritual_edit, name='ritual_edit'),
-    path('admin/ritual/<int:pk>/delete/', views.ritual_delete, name='ritual_delete'),
-
     # Session functionality
     path('session/<int:pk>/', views.session_detail, name='session_detail'),
     path('edit-session/<int:pk>/', views.edit_session, name='edit_session'),
