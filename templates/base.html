@@ -21,8 +21,16 @@
             <div class="logo">
                 <a href="{% url 'journal:home' %}">Downward</a>
             </div>
-            <ul class="nav-links">
-                {% if user.is_authenticated %}
+
+            <!--Mobile toggle button -->
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle Navigation">
+                <i class="fas fa-bars" id="toggleIcon"></i>
+            </button>
+
+            <!-- Desktop Navigation -->
+            <div class="nav-menu desktop-menu">
+                <ul class="nav-links">
+                    {% if user.is_authenticated %}
                     <li><a href="{% url 'journal:start_descent' %}">
                         <i class="fas fa-arrow-down"></i> New Descent
                     </a></li>
@@ -45,7 +53,36 @@
                         <i class="fas fa-user-plus"></i> Register
                     </a></li>
                 {% endif %}
-            </ul>
+                </ul>
+            </div>
+
+            <div class="nav-menu mobile-menu" id="mobileMenu">
+                <ul class="nav-links">
+                    {% if user.is_authenticated %}
+                        <li><a href="{% url 'journal:start_descent' %}">
+                            <i class="fas fa-arrow-down"></i> New Descent
+                        </a></li>
+                        <li><a href="{% url 'journal:journal_history' %}">
+                            <i class="fas fa-history"></i> My Journeys
+                        </a></li>
+                        {% if user.is_superuser %}
+                        <li><a href="{% url 'journal:admin_dashboard' %}">
+                            <i class="fas fa-cog"></i> Admin Dashboard
+                        </a></li>
+                        {% endif %}
+                        <li><a href="{% url 'accounts:logout' %}">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a></li>
+                    {% else %}
+                        <li><a href="{% url 'accounts:login' %}">
+                            <i class="fas fa-sig-in-alt"></i> Login
+                        </a></li>
+                        <li><a href="{% url 'accounts:register' %}">
+                            <i class="fas fa-user-plus"></i> Register
+                        </a></li>
+                    {% endif %}
+                </ul>
+            </div>
         </nav>
     </header>
 
@@ -70,6 +107,29 @@
 
      <!-- Javascript -->
     <script src="{% static '/js/main.js' %}" ></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const navToggle = document.getElementById('navToggle');
+            const navMenu = document.getElementById('mobileMenu');
+            const toggleIcon = document.getElementById('toggleIcon');
+
+            
+            navToggle.addEventListener('click', function() {
+                mobileMenu.classList.toggle('active');
+                toggleIcon.classList.toggle('fa-bars');
+                toggleIcon.classList.toggle('fa-times');
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!navToggle.contains(e.target) && !mobileMenu.CONTAINS(e.target)) {
+                    mobileMenu.classList.remove('active');
+                    toggleIcon.classList.remove('fa-times');
+                    toggleIcon.classList.add('fa-bars');
+                }
+            });
+
+    </script>
+    script
      {% block extra_js %}
      {% endblock %}
     
