@@ -115,21 +115,22 @@
 
             
             navToggle.addEventListener('click', function() {
-                mobileMenu.classList.toggle('active');
+                navMenu.classList.toggle('active');
                 toggleIcon.classList.toggle('fa-bars');
                 toggleIcon.classList.toggle('fa-times');
             });
 
             document.addEventListener('click', function(e) {
-                if (!navToggle.contains(e.target) && !mobileMenu.CONTAINS(e.target)) {
-                    mobileMenu.classList.remove('active');
+                if (!navToggle.contains(e.target) && !navMenu.contains(e.target)) {
+                    navMenu.classList.remove('active');
                     toggleIcon.classList.remove('fa-times');
                     toggleIcon.classList.add('fa-bars');
                 }
             });
+        });
 
     </script>
-    script
+    
      {% block extra_js %}
      {% endblock %}
     

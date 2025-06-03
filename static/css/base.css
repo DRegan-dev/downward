@@ -765,36 +765,37 @@ h1, h2, h3, h4, h5, h6 {
         width: 100%;
         justify-content: center;
     }
-     .admin-form-container  {
+    .admin-form-container  {
         margin: 1rem;
         padding: 1rem
      }
 
-     .form-buttons {
+    .form-buttons {
         flex-direction: column;
      }
 
-     .admin-button {
+    .admin-button {
         width: 100%;
      }
 
-     .nav-toggle {
+    .nav-toggle {
         display: block;
      }
 
-     .desktop-menu {
+    .desktop-menu {
         display: none;
      }
 
-     .mobile-menu {
+    .mobile-menu {
         display: none;
         position: fixed;
         width: 100%;
-        top: 60px;
+        top: 100px;
         left: 0;
         background: white;
         padding: 1rem;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
      }
       .mobile-menu.active {
         display: block;
@@ -803,14 +804,15 @@ h1, h2, h3, h4, h5, h6 {
     .nav-links {
         flex-direction: column;
         gap: 0;
-        background-color: ;
+        background-color: white;
         border-radius: 8px;
         padding: 1rem 0;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        color: #e0e0e0;
     }
 
     .nav-links li {
         width: 100%;
+        color: #e0e0e0;
 
     }
 
@@ -827,7 +829,7 @@ h1, h2, h3, h4, h5, h6 {
     }
 
     .nav-links li a:hover {
-        background-color: #f8f9a;
+        background-color: #f8f98f;
     }
 
     /* Animation for menu */

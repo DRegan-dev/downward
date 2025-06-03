@@ -6,10 +6,10 @@
             {{ form.as_p }}
         </div>
         <div class="form-buttons">
-            <button type="submit" class="admin-button primary">
+            <button type="submit" class="action-button">
                 <i class="fas fa-{{ action|lower }}-circle"></i> {{ action }}
             </button>
-            <a href="{% url 'admin_dashboard' %}" class="admin-button secondary">
+            <a href="{% url 'admin_dashboard' %}" class="action-button">
                 <i class="fas fa-arrow-left"></i> Back
             </a>
         </div>

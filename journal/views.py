@@ -252,7 +252,7 @@ def complete_descent(request, pk):
     session.status = 'COMPLETED'
     session.completed_at = timezone.now()
     session.save()
-    return redirect('journal:home')
+    return redirect('journal:journal_history')
 
 @login_required
 def abandon_descent(request, pk):
