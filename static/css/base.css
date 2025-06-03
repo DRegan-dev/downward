@@ -636,7 +636,8 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--color-text-primary);
 }
 
-.action-button.delete {
+.action-button.delete,
+.action-button.edit {
     background-color: var(--color-accent);
     color: var(--color-text-primary);
 }
