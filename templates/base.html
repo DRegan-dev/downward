@@ -11,10 +11,30 @@
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-16x16.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-32x32.png">
     <link rel="manifest" href="/site.webmanifest">
-    <link rel="stylesheet" href="/static/css/base.css">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
     <script src="https://kit.fontawesome.com/5125eaa352.js" crossorigin="anonymous"></script>
 </head>
 <body>
+
+    <!-- Skip to main content link for screen readers -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Messages Container -->
+    {% if messages %}
+    <div class="messages-container" aria-live="polite" aria-atomic="true">
+        <div class="messages-inner">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                <span>{{ message }}</span>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    
     <!-- Navigation -->
     <header class="main-header">
         <nav class="main-navigation">
@@ -31,26 +51,26 @@
             <div class="nav-menu desktop-menu">
                 <ul class="nav-links">
                     {% if user.is_authenticated %}
-                    <li><a href="{% url 'journal:start_descent' %}">
+                    <li><a href="{% url 'journal:start_descent' %}" class="nav-link">
                         <i class="fas fa-arrow-down"></i> New Descent
                     </a></li>
-                    <li><a href="{% url 'journal:journal_history' %}">
+                    <li><a href="{% url 'journal:journal_history' %}" class="nav-link">
                         <i class="fas fa-history"></i> My Journeys
                     </a></li>
                     {% if user.is_superuser %}
-                    <li><a href="{% url 'journal:admin_dashboard' %}">
+                    <li><a href="{% url 'journal:admin_dashboard' %}" class="nav-link">
                         <i class="fas fa-cog"></i> Admin Dashboard
                     </a></li>
                     {% endif %}
-                    <li><a href="{% url 'accounts:logout' %}">
+                    <li><a href="{% url 'accounts:logout' %}" class="nav-link">
                         <i class="fas fa-sign-out-alt"></i> Logout
                     </a></li>
                 {% else %}
-                    <li><a href="{% url 'accounts:login' %}">
-                        <i class="fas fa-sig-in-alt"></i> Login
+                    <li><a href="{% url 'accounts:login' %}" class="nav-link">
+                        <i class="fas fa-sign-in-alt"></i> Login
                     </a></li>
-                    <li><a href="{% url 'accounts:register' %}">
-                        <i class="fas fa-user-plus"></i> Register
+                    <li><a href="{% url 'accounts:register' %}" class="nav-link">
+                        <i class="fas fa-user-plus"></i> Sign Up
                     </a></li>
                 {% endif %}
                 </ul>
@@ -75,7 +95,7 @@
                         </a></li>
                     {% else %}
                         <li><a href="{% url 'accounts:login' %}">
-                            <i class="fas fa-sig-in-alt"></i> Login
+                            <i class="fas fa-sign-in-alt"></i> Login
                         </a></li>
                         <li><a href="{% url 'accounts:register' %}">
                             <i class="fas fa-user-plus"></i> Register
@@ -88,7 +108,7 @@
 
      <!-- Main Content Area -->
 
-    <main class="site-content">
+    <main class="site-content" id="main-content">
         {% block content %}
         {% endblock %}
     </main>
@@ -106,27 +126,52 @@
     </footer>
 
      <!-- Javascript -->
-    <script src="{% static '/js/main.js' %}" ></script>
+    <script src="{% static 'js/main.js' %}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Auto dismiss alerts after 5 seconds with smooth fade
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                // Auto dismiss
+                setTimeout(() => {
+                    alert.style.opacity = '0';
+                    setTimeout(() => alert.remove(), 300);
+                }, 5000);
+
+                // Manual dismiss on click
+                const closeBtn = alert.querySelector('.close');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => {
+                        alert.style.opacity = '0';
+                        setTimeout(() => alert.remove(), 300);
+                    });
+                }
+            });
+
+            // Mobile navigation toggle with
             const navToggle = document.getElementById('navToggle');
             const navMenu = document.getElementById('mobileMenu');
             const toggleIcon = document.getElementById('toggleIcon');
 
-            
-            navToggle.addEventListener('click', function() {
-                navMenu.classList.toggle('active');
-                toggleIcon.classList.toggle('fa-bars');
-                toggleIcon.classList.toggle('fa-times');
-            });
+            if (navToggle && navMenu && toggleIcon) {
+                navToggle.addEventListener('click', function() {
+                    const expanded = this.getAttribute('aria-expanded') === 'true' || false;
+                    this.setAttribute('aria-expanded', !expanded);
+                    navMenu.classList.toggle('active');
 
-            document.addEventListener('click', function(e) {
-                if (!navToggle.contains(e.target) && !navMenu.contains(e.target)) {
-                    navMenu.classList.remove('active');
-                    toggleIcon.classList.remove('fa-times');
-                    toggleIcon.classList.add('fa-bars');
-                }
-            });
+                    toggleIcon.classList.toggle('fa-bars');
+                    toggleIcon.classList.toggle('fa-times');
+                });
+
+                document.addEventListener('click', function(e) {
+                    if (!navToggle.contains(e.target) && !navMenu.contains(e.target)) {
+                        navMenu.classList.remove('active');
+                        navToggle.setAttribute('aria-expanded', 'false');
+                        toggleIcon.classList.remove('fa-times');
+                        toggleIcon.classList.add('fa-bars');
+                    }
+                });
+            }
         });
 
     </script>

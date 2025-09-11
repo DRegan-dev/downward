@@ -125,23 +125,19 @@ def start_descent(request):
     """
 
     if request.method == 'POST':
-        # Get selected descent type
-        descent_type_id = request.POST.get('descent_type')
-        descent_type = get_object_or_404(DescentType, pk=descent_type_id)
+        form = DescentSessionForm(request.POST, user=request.user)
+        if form.is_valid():
+            session = form.save(commit=False)
+            session.user = request.user
+            session.save()
+            messages.success(request, 'Descent session started successfully!')
+            return redirect('journal:continue_descent', pk=session.pk)
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = DescentSessionForm(user=request.user)
 
-        # Create new descent session
-        session = DescentSession.objects.create(
-            user=request.user,
-            descent_type=descent_type,
-            status='STARTED'
-        )
-        return redirect('journal:continue_descent', pk=session.pk)
-    
-    descent_types = DescentType.objects.all()
-    return render(request, 'journal/start_descent.html', {
-        'descent_types': descent_types
-    })
-
+    return render(request, 'journal/start_descent.html', {'form': form})
 
 
 @login_required
@@ -267,71 +263,115 @@ def abandon_descent(request, pk):
 def add_entry(request, session_id):
     session = get_object_or_404(DescentSession, pk=session_id, user=request.user)
 
-    content = request.POST.get('content')
-    reflection = request.POST.get('reflection')
-    emotion_level = request.POST.get('emotion_level')
+    if request.method == 'POST':
+        form = EntryForm(request.POST)
+        if form.is_valid():
+            entry = form.save(commit=False)
+            entry.session = session
+            entry.save()
+            messages.success(request, 'Entry add successfully!')
+            return redirect('journal:continue_descent', pk=session.pk)
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = EntryForm()
 
-    if not content or not emotion_level:
-        return JsonResponse({'success': False, 'error': 'Content and emotion level are required'})
-    
-    try:
-        emotion_level = int(emotion_level)
-        if emotion_level < 1 or emotion_level > 5:
-            return JsonResponse({'success': False, 'error': 'Invalid eotion level'})
+    context = {
+        'form': form,
+        'session': session,
+    }
+    return render(request, 'journal/add_entry.html', context)
         
-        Entry.objects.create(
-            session=session,
-            content=content,
-            emotion_level=emotion_level,
-            reflection=reflection
-        )
-        return JsonResponse({'success': True})
+
+    # content = request.POST.get('content')
+    # reflection = request.POST.get('reflection')
+    # emotion_level = request.POST.get('emotion_level')
+
+    # if not content or not emotion_level:
+    #     return JsonResponse({'success': False, 'error': 'Content and emotion level are required'})
     
-    except (ValueError, TypeError):
-        return JsonResponse({'success': False, 'error': ' Invalid emotion level'})
+    # try:
+    #     emotion_level = int(emotion_level)
+    #     if emotion_level < 1 or emotion_level > 5:
+    #         return JsonResponse({'success': False, 'error': 'Invalid eotion level'})
+        
+    #     Entry.objects.create(
+    #         session=session,
+    #         content=content,
+    #         emotion_level=emotion_level,
+    #         reflection=reflection
+    #     )
+    #     return JsonResponse({'success': True})
+    
+    # except (ValueError, TypeError):
+    #     return JsonResponse({'success': False, 'error': ' Invalid emotion level'})
     
 @login_required
 def edit_entry(request, entry_id):
     entry = get_object_or_404(Entry, id=entry_id, session__user=request.user)
 
     if request.method == 'POST':
-        content = request.POST.get('content')
-        reflection = request.POST.get('reflection')
-        emotion_level = request.POST.get('emotion_level')
+        form = EntryForm(request.POST, instance=entry)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Entry updated successfully!')
+            return redirect('journal:continue_descent', pk=entry.session.pk)
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = EntryForm(instance=entry)
 
-        if not content or not emotion_level:
-            messages.error(request, 'Content and emotion level are required.')
-            return redirect('Journal:edit_entry', entry_id=entry_id)
+    context = {
+        'form' == form,
+        'entry' == entry,
+    }
+    return render(request, 'journal/edit_entry.html', context)
+    #     content = request.POST.get('content')
+    #     reflection = request.POST.get('reflection')
+    #     emotion_level = request.POST.get('emotion_level')
+
+    #     if not content or not emotion_level:
+    #         messages.error(request, 'Content and emotion level are required.')
+    #         return redirect('Journal:edit_entry', entry_id=entry_id)
     
-        try:
-            emotion_level = int(emotion_level)
-            if emotion_level < 1 or emotion_level > 5:
-                raise ValueError('Invalid emotion level')
+    #     try:
+    #         emotion_level = int(emotion_level)
+    #         if emotion_level < 1 or emotion_level > 5:
+    #             raise ValueError('Invalid emotion level')
         
-            entry.content = content
-            entry.emotion_level = emotion_level
-            entry.reflection = reflection
-            entry.save()
+    #         entry.content = content
+    #         entry.emotion_level = emotion_level
+    #         entry.reflection = reflection
+    #         entry.save()
 
-            messages.success(request, 'Entry updated successfully.')
-            return redirect('journal:session_detail', pk=entry.session.pk)
+    #         messages.success(request, 'Entry updated successfully.')
+    #         return redirect('journal:session_detail', pk=entry.session.pk)
     
-        except (ValueError, TypeError):
-            messages.error(request, "Invalid emotion level")
-            return redirect('journal:edit_entry', entry_id=entry_id)
+    #     except (ValueError, TypeError):
+    #         messages.error(request, "Invalid emotion level")
+    #         return redirect('journal:edit_entry', entry_id=entry_id)
     
-    return render(request, 'journal/edit_entry.html', {
-        'entry': entry,
-        'emotion_levels': range(1, 6)
-    })
+    # return render(request, 'journal/edit_entry.html', {
+    #     'entry': entry,
+    #     'emotion_levels': range(1, 6)
+    # })
 
 @login_required
 @require_POST
 def delete_entry(request, entry_id):
     entry = get_object_or_404(Entry, pk=entry_id, session__user=request.user)
-    entry.delete()
-    return JsonResponse({{'success': True}})
+    session_pk = entry.session.pk
 
+    if request.method == 'POST':
+        entry.delete()
+        messages.success(request, 'Entry deleted successfully.')
+        return redirect('journal:continue_descent', pk=session_pk)
+
+    return render(request, 'journal/confirm_delete.html', {
+        'object': entry,
+        'cancel_url': reverse('journal:coninue_descent', kwargs={ 'pk': session_pk }),
+        'object_type': 'entry',
+    })
 @login_required
 def journal_history(request):
     """
