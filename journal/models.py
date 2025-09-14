@@ -16,6 +16,7 @@ class DescentType(models.Model):
     description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     type = models.CharField(max_length=50, choices=TYPE_CHOICES, default='EMOTIONAL')
+    is_active = models.BooleanField(default=True, help_text='Designates whether this descent type is active and can be selected.')
     
     def __str__(self):
         return self.name

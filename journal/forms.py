@@ -52,22 +52,18 @@ class DescentTypeForm(forms.ModelForm):
         def clean_name(self):
             name = self.cleaned_data.get('name')
             if name and len(name.strip()) < 3:
-                raise forms.ValidationError(_('Nme must be at least 3 characters long'))
+                raise forms.ValidationError(_('Name must be at least 3 characters long'))
             return name.strip()
         
 class DescentSessionForm(BaseForm):
     class Meta:
         model = DescentSession
-        fields = ['descent_type', 'status', 'notes']
+        fields = ['descent_type', 'notes']
         widgets = {
             'descent_type': forms.Select(attrs={
                 'class': 'form-select',
                 'aria_label': 'Select descent type',
-            }),
-            'status': forms.Select(attrs={
-                'class': 'form-select',
-                'aria-label': 'Select status',
-            }),
+            }), 
             'notes': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 3,
@@ -75,6 +71,31 @@ class DescentSessionForm(BaseForm):
                 'area-label': 'Session notes',
             }),
         }
+        error_messages = {
+            'descent_type': {
+                'required': 'Please select a descent type',
+            },
+        }
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
+        # Filter active descent types
+        self.fields['descent_type'].queryset = DescentType.objects.filter(
+            is_active=True
+        ).order_by('name')
+
+        # Add form control class to all fields
+        for field_name, field in self.fields.items():
+            if 'class' not in field.widget.attrs:
+                field.widget.attrs['class'] = 'form-control'
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if self.user:
+            instance.user = self.user
+        if commit:
+            instance.save()
+        return instance
 
 class EntryForm(BaseForm):
     class Meta:

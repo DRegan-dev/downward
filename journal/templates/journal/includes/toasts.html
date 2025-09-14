@@ -1,0 +1,66 @@
+{# Toast container #}
+<div class="toast-container" id="toastContainer">
+    {% for message in messages %}
+    <div class="toast toast-{{ message.tags }}" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            {% if message.tags == 'error' %}
+                <i class="fa fa-exclamation-circle"></i>
+                <strong class="toast-title">Error</strong>
+            {% elif message.tags == 'success' %}
+                <i class="fas fa-check-circle"></i>
+                <strong class="toast-title">Success</strong>
+            {% elif message.tags == 'warning' %}
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong class="toast-title">Info</strong>
+            {% else %}
+                <i class="fas fa-info--circle"></i>
+                <div class="tast-title">Info</div>
+            {% endif %}
+            <button type="button" class="toast-close" aria-label="Close">&times;</button>
+        </div>
+        <div class="toast-body">
+            {{ message }}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Show all toasts
+    const toasts = document.querySelectorAll('.toast');
+
+    toasts.forEach(toast => {
+        // Show toast
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 10);
+
+        const timer = setTimeout(() => {
+            hideToast(toast);
+        }, 5000);
+
+        // Close button
+        const closeBtn = toast.querySelector('.toast-close');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                clearTimeout(timer);
+                hideToast(toast);
+            });
+        }
+
+        // Hide on click anywhere
+        toast.addEventListener('click', () => {
+            clearTimeout(timer);
+            hideToast(toast);
+        });
+    });
+
+    function hideToast(toast) {
+        //Remove from DOM after animation
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
+    }
+})
+</script>

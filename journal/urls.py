@@ -21,10 +21,10 @@ urlpatterns = [
     path('dashboard/', views.admin_dashboard, name='admin_dashboard'),
 
     # Descent Type Management
-    path('admin/descent-type/', views.descent_type_list, name='descent_type_list'),
-    path('admin/descent-type/add/', views.descent_type_add, name='descent_type_add'),
-    path('admin/descent-type/<int:pk>/edit/', views.descent_type_edit, name='descent_type_edit'),
-    path('admin/descent-type/<int:pk>/delete/', views.descent_type_delete, name='descent_type_delete'),
+    path('dashboard/descent-type/', views.descent_type_list, name='descent_type_list'),
+    path('dashboard/descent-type/add/', views.descent_type_add, name='descent_type_add'),
+    path('dashboard/descent-type/<int:pk>/edit/', views.descent_type_edit, name='descent_type_edit'),
+    path('dashboard/descent-type/<int:pk>/delete/', views.descent_type_delete, name='descent_type_delete'),
 
     # Session functionality
     path('session/<int:pk>/', views.session_detail, name='session_detail'),

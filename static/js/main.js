@@ -247,8 +247,6 @@ function showTooltip(e) {
     this.setAttribute('data-tooltip', 'true');
 }
 
-/**
- * Hide tooltip
  * @param {Event} e - The event object
  */
 function hideTooltip(e) {

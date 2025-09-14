@@ -45,6 +45,11 @@
                 <button type="submit" name="action" class="action-button">
                     <i class="fas fa-save"></i> Save Changes
                 </button>
+                {% if not session.completed %}
+                <button type="submit" name="complete_session" value="1" class="btn btn-success">
+                    <i class="fas fa-check"></i> Complete Session
+                </button>
+                {% endif %}
                 <a href="{% url 'journal:home' %}" class="btn btn-danger">
                     <i class="fas fa-times"></i> Back to Journal
                 </a>

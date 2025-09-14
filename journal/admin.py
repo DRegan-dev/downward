@@ -28,7 +28,7 @@ class DescentSessionAdmin(admin.ModelAdmin):
     ordering = ('-started_at',)
     fieldsets = (
         (None, {
-            'fields': ('User', 'descent_type', 'status', 'notes')
+            'fields': ('user', 'descent_type', 'status', 'notes')
         }),
         ('Timestamps', {
             'fields': ('started_at', 'completed_at', 'abandoned_at'),

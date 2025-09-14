@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.db.models import Count
 from django.utils import timezone
 from .models import DescentType, DescentSession, Entry 
-from .forms import DescentTypeForm
+from .forms import DescentTypeForm, DescentSessionForm
 from django.views.decorators.http import require_POST, require_http_methods
 from django.contrib.auth.models import User
 import datetime
@@ -129,14 +129,19 @@ def start_descent(request):
         if form.is_valid():
             session = form.save(commit=False)
             session.user = request.user
+            session.status = 'Started'
             session.save()
             messages.success(request, 'Descent session started successfully!')
             return redirect('journal:continue_descent', pk=session.pk)
         else:
+            print("Form errors:", form.errors)
+            print("Non-field errors:", form.non_field_errors())
             messages.error(request, 'Please correct the errors below.')
     else:
         form = DescentSessionForm(user=request.user)
-
+        # Filter descent types to only show active ones
+        form.fields['descent_type'].queryset = DescentType.objects.filter(is_active=True)
+        
     return render(request, 'journal/start_descent.html', {'form': form})
 
 
@@ -197,8 +202,9 @@ def continue_descent(request, pk):
                 return redirect('journal:complete_descent', pk=pk)
             
             elif action == 'save_progress':
-                session.status = 'IN_PROGRESS'
-                session.save()
+                if session.status != 'IN_PROGRESS': 
+                    session.status = 'IN_PROGRESS'
+                    session.save()
                 messages.success(request, "Entry added successfully. Continue your descent.")
                 return redirect('journal:journal_history')
 
@@ -221,6 +227,14 @@ def edit_session(request, pk):
     entries = Entry.objects.filter(session=session).order_by('timestamp')
 
     if request.method == 'POST':
+
+        # Check if this is a complete session request
+        if 'complete_session' in request.POST:
+            session.status = 'Completed'
+            session.completed_at = timezone.now()
+            session.save()
+            messages.success(request, 'Session marked as completed successfully')
+            return redirect('journal:journal_history')
         # hANDLE Individual entry updates
         for entry in entries:
             content_key = f'content_{entry.id}'
@@ -248,6 +262,7 @@ def complete_descent(request, pk):
     session.status = 'COMPLETED'
     session.completed_at = timezone.now()
     session.save()
+    messages.success(request, 'Session marked as completed successfully!')
     return redirect('journal:journal_history')
 
 @login_required

@@ -23,7 +23,6 @@ def render_dashboard_stats():
         'total_sessions': DescentSession.objects.count(),
         'active_sessions': DescentSession.objects.filter(status__in=['STARTED', 'IN_PROGRESS']).count(),
         'total_entries': Entry.objects.count(),
-        'total_rituals': Ritual.objects.count(),
         'total_descent_types': DescentType.objects.count()
     }
     return {'stats': stats}

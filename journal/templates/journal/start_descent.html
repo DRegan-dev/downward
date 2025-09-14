@@ -9,13 +9,25 @@
     <form class="descent-form" method="post">
         {% csrf_token %}
 
-        <div class="form-group">
-            <label for="descent_type">Choose a Descent Type</label>
-            <select name="descent_type" id="descent_type" class="form-control">
-                {% for type in descent_types %}
-                    <option value="{{ type.pk }}">{{ type.name }} - {{ type.get_type_display }}</option>
+        {% if form.non_field_errors %}
+            <div class="error-message">
+                {% for error in form.non_field_errors %}
+                    {{ error }}
                 {% endfor %}
-            </select>
+            </div>
+        {% endif %}
+
+        <div class="form-group">
+            <label for="{{ form.descent_type.id_for_label }}">Choose a Descent Type</label>
+            <!-- <select name="descent_type" id="descent_type" class="form-control"> -->
+                {{ form.descent_type }}
+                {% if form.decent_type.errors %}
+                    <div class="error-message">{{ form.descent_type.errors.0 }}</div>
+                {% endif %}
+                <!-- {% for type in descent_types %} -->
+                    <!-- <option value="{{ type.pk }}">{{ type.name }} - {{ type.get_type_display }}</option>
+                {% endfor %}
+            </select> -->
         </div>
 
         <div class="form-buttons">
