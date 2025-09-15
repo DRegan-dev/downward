@@ -71,9 +71,9 @@ function initializeMobileMenu() {
 
 function initalizeFormValidation() {
     //Add validation classes to form inputs on blur
-    const formInputs = document.querySelectorAll('input[required], textarea[required]. select[required]');
+    const formInputs = document.querySelectorAll('input[required], textarea[required], select[required]');
 
-    formInputs.forEach(imput => {
+    formInputs.forEach(input => {
         // Add validation classes on blur
         input.addEventListener('blur', function() {
             validateField(this);
@@ -83,7 +83,7 @@ function initalizeFormValidation() {
         input.addEventListener('focus', function() {
             this.classList.remove('is_invalid');
             const feedback = this.nextElementSibling;
-            if (feedback && feedback.classList.contains('invlid-feedback')) {
+            if (feedback && feedback.classList.contains('invalid-feedback')) {
                 feedback.style.display = 'none';
             }
         });
@@ -91,14 +91,14 @@ function initalizeFormValidation() {
 
     // Add form submission validation
     const forms = document.querySelectorAll('form');
-    forms forEach(form => {
+    forms.forEach(form => {
         form.addEventListener('submit', function(e) {
             if (!this.checkValidity()) {
                 e.preventDefault();
                 e.stopPropagation();    
 
                 // Validate all fields
-                const inputs = this.querySelectorsAll('input, textarea, select');
+                const inputs = this.querySelectorAll('input, textarea, select');
                 inputs.forEach(inpu => validateField(input));
 
                 // Focus on first invalid field
@@ -122,7 +122,7 @@ function validateField(field) {
     if (!field) return;
 
     // Skip if field is not required and empty
-    if (!field.required && !field.ariaValueMax.trim()) {
+    if (!field.required && !field.value.trim()) {
         return 
     }
 
@@ -165,7 +165,7 @@ function initializeAccessibilityFeatures() {
     modals.forEach(modal => {
         //Focus trap for modals
         if (modal.getAttribute('data-focus-trap') !== 'true') {
-            modal setAttribute('data-focus-trap', 'true');
+            modal.setAttribute('data-focus-trap', 'true');
 
             const focusableElements = 'button, [href], input, select, textarea [tabindex]:not([tabindex="-1"])';
             const firstFocusableElement = modal.querySelectorAll(focusableElements)[0];
@@ -211,7 +211,7 @@ function initializeAccessibilityFeatures() {
 function initializeTooltips() {
     // Initialize Bootstraps tooltips if available
     if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
-        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip]'));
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
@@ -246,7 +246,7 @@ function showTooltip(e) {
     document.body.appendChild(tooltip);
     this.setAttribute('data-tooltip', 'true');
 }
-
+/** 
  * @param {Event} e - The event object
  */
 function hideTooltip(e) {
@@ -266,7 +266,7 @@ function hideTooltip(e) {
 function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
-        const later = () {
+        const later = () => {
             clearTimeout(timeout);
             func(...args);
         };

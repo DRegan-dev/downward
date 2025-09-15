@@ -15,7 +15,7 @@
             <div class="entry-edit-section">
                 <h3>Entry {{ forloop.counter }} - {{ entry.timestamp|date:"M d, g:i A" }}</h3>
                 
-                div class="form-group">
+                <div class="form-group">
                         <label for="content_{{ entry_id }}">Content</label>
                         <textarea name="content_{{ entry.id }}" id="content_{{ entry.id }}" class="form-control" rows="4" required>{{ entry.content }}</textarea>
                 </div>
