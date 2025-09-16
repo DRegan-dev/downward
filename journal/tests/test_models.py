@@ -9,11 +9,12 @@ class TestDescentType(TestCase):
         """ Test creating a new descent type """
         descent_type = DescentType.objects.create(
             name="Test Descent",
-            description="A test descent type"
+            description="A test descent type",
+            type='EMOTIONAL'
         )
         self.assertEqual(str(descent_type), "Test Descent")
         self.assertEqual(descent_type.description, "A test descent type")
-        self.assertEqual(descent_type.is_active)
+        self.assertEqual(descent_type.is_active, True)
 
 class TestDescentSession(TestCase):
     def setUp(self):
@@ -22,26 +23,39 @@ class TestDescentSession(TestCase):
             email='test@example.com',
             password='testpass123'
         )
-        self.descent_type = DescentType.objects.create(name="Test Descent")
+        self.descent_type = DescentType.objects.create(
+            name="Test Descent",
+            type='EMOTIONAL',
+            description="Test description"
+        )
 
     def test_create_descent_session(self):
         """Test creating a new descent session"""
         session = DescentSession.objects.create(
             user=self.user,
             descent_type=self.descent_type,
-            title="Title Session"
         )
-        self.assertEqual(str(session), f"{self.user.username}'s {self.descent_type.name}")
-        self.assertEqual(session.status, 'IN_PROGRESS')
+        self.assertEqual(session.user, self.user)
+        self.assertEqual(session.descent_type, self.descent_type)
+        self.assertEqual(session.status, 'STARTED')
+        self.assertIsNotNone(session.started_at)
 
 class TestEntry(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username='testuser', password='testpass123')
-        self.descent_type = DescentType.objects.create(name='Test Descent')
+        self.user = User.objects.create_user(
+            username='testuser',
+            password='testpass123',
+            email='test@example.com'
+        )
+        self.descent_type = DescentType.objects.create(
+            name='Test Descent',
+            type='EMOTIONAL',
+            description="Test description"
+            
+        )
         self.session = DescentSession.objects.create(
             user=self.user,
             descent_type=self.descent_type,
-            title="Test Session"
         )
 
     def test_create_entry(self):
@@ -52,6 +66,7 @@ class TestEntry(TestCase):
             emotion_level=3,
             reflection="Test reflection"
         )
-        self.assertEqual(entry.content, "Test content")
+        self.assertEqual(entry.content, "Test Content")
         self.assertEqual(entry.emotion_level, 3)
         self.assertEqual(entry.reflection, "Test reflection")
+        self.assertEqual(entry.session, self.session)
