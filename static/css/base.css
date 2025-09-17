@@ -229,7 +229,7 @@ body {
 /* Form Styling */
 
 .form-border {
-    border: solid 2px #fff;
+    border: solid 2px #fff; !important
 }
 
 .form-group {

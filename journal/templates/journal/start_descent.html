@@ -6,7 +6,7 @@
     {% if not session %}
     <h1>Start new Descent</h1>
         
-    <form class="descent-form" method="post">
+    <form class="descent-form" method="post" action="{% url 'journal:start_descent' %}">
         {% csrf_token %}
 
         {% if form.non_field_errors %}
