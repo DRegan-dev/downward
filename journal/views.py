@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.db.models import Count
 from django.utils import timezone
 from .models import DescentType, DescentSession, Entry 
-from .forms import DescentTypeForm, DescentSessionForm
+from .forms import DescentTypeForm, DescentSessionForm, EntryForm
 from django.views.decorators.http import require_POST, require_http_methods
 from django.contrib.auth.models import User
 import datetime
@@ -275,8 +275,8 @@ def abandon_descent(request, pk):
 
 @login_required
 @require_POST
-def add_entry(request, session_id):
-    session = get_object_or_404(DescentSession, pk=session_id, user=request.user)
+def add_entry(request, pk):
+    session = get_object_or_404(DescentSession, pk=pk, user=request.user)
 
     if request.method == 'POST':
         form = EntryForm(request.POST)
@@ -284,7 +284,7 @@ def add_entry(request, session_id):
             entry = form.save(commit=False)
             entry.session = session
             entry.save()
-            messages.success(request, 'Entry add successfully!')
+            messages.success(request, 'Entry added successfully!')
             return redirect('journal:continue_descent', pk=session.pk)
         else:
             messages.error(request, 'Please correct the errors below.')
@@ -337,8 +337,9 @@ def edit_entry(request, entry_id):
         form = EntryForm(instance=entry)
 
     context = {
-        'form' == form,
-        'entry' == entry,
+        'form': form,
+        'entry': entry,
+        'emotion_levels': range(1, 6)
     }
     return render(request, 'journal/edit_entry.html', context)
     #     content = request.POST.get('content')
@@ -482,6 +483,17 @@ def session_list(request):
 def session_detail(request, pk):
     session = get_object_or_404(DescentSession, pk=pk, user=request.user)
 
+    # Handle session completion
+    if request.method == 'POST' and 'complete_session' in request.POST:
+        if session.status != 'COMPLETED':
+            session.status = 'COMPLETED'
+            session.completed_at = timezone.now()
+            session.save()
+            messages.success(request, 'Session marked as completed successfully!')
+            return redirect('journal:journal_history')
+        else:
+            messages.warning(request, 'This session is already completed.')
+            return redirect('journal:journal_history')
     # Get all entries for this session
     entries = Entry.objects.filter(session=session).order_by('timestamp')
 

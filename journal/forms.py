@@ -138,7 +138,7 @@ class EntryForm(BaseForm):
     def clean_emotion_level(self):
         emotion_level = self.cleaned_data.get('emotion_level')
         if emotion_level is not None and (emotion_level < 1 or emotion_level > 10):
-            raise forms.ValidationError(-('Emotion level must be between 1 and 10'))
+            raise forms.ValidationError(_('Emotion level must be between 1 and 10'))
         return emotion_level
     
     def clean_content(self):

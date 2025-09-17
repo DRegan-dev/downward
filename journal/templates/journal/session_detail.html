@@ -41,12 +41,15 @@
 
     <div class="session-actions">
         {% if not session.completed %}
-        <a href="{% url 'journal:continue_descent' session.pk %}" class="action-button delete">
-            <i class="fas fa-arrow-left"></i> Start Over
-        </a>
-        <button type="submit" name="action" value="complete" class="action-button">
-            <i class="fas fa-save"></i> Complete Session
-        </button>
+        <form action="{% url 'journal:session_detail' pk=session.pk %}" method="post" style="display: inline;">
+            {% csrf_token %}
+            <a href="{% url 'journal:continue_descent' session.pk %}" class="action-button delete">
+                <i class="fas fa-arrow-left"></i> Start Over
+            </a>
+            <button type="submit" name="complete_session" value="1" class="action-button">
+                <i class="fas fa-save"></i> Complete Session
+            </button>
+        </form>
         {% else %}
         <a href="{% url 'journal:edit_session' session.pk %}" class="action-button delete">
             <i class="fas fa-edit"></i> Edit Session
