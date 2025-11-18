@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %} 
+
+{% block content %}
+<div class="admin-form-container">
+    <h2> Edit User: {{ user.username }}</h2>
+    <form class="admin-form" method="post">
+        {% csrf_token %}
+
+        <!-- User Information -->
+        <div class="form-section">
+            <h3>User Information</h3>
+            {{ user_form.as_p }}
+        </div>
+
+         <!-- Password CHange -->
+        <div class="form-section">
+            <h3>Change Password (optional)</h3>
+            {{ password_form.as_p }}
+        </div>
+
+        <div class="form-buttons">
+            <button class="admin-button primary">
+                <i class="fas fa save"></i> Save Changes
+            </button>
+            <a href="{% url 'user_list' %}" class="admin-button secondary">
+                <i class="fas fa-arrow-left"></i> Back to Users
+            </a>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="policy-container">
+    <h1 class="policy-title">Terms of Service</h1>
+    <p class="policy-intro">Effective Date: {% now "F j, Y" %}</p>
+
+    <div class="policy-content">
+        {% for section in sections %}
+        <section class="policy-section">
+            <h2 class="section-title">{{ section.title }}</h2>
+            <div class="section-content">
+                <p>{{ section.content }}</p>
+            </div>
+        </section>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

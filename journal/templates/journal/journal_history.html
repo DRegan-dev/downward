@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="journal-history-container">
+    <h1>My Descent History</h1>
+
+    <!-- Session Filters -->
+    <div class="filters">
+        <form class="filter-form" method="get">
+            <select name="descent_type" class="filter-select">
+                <option value="">All Descent Types</option>
+                {% for type in descent_types %}
+                <option value="{{ type.pk }}" {% if request.GET.descent_type == type.pk|stringformat:"s" %}selected{% endif %}>
+                    {{ type.name }}
+                </option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="filter-button">
+                <i class="fas fa-filter"></i> Filter
+            </button>
+        </form>
+    </div>
+
+    <!-- Session List -->
+    {% if sessions %}
+    <div class="session-list">
+        {% for session in sessions %}
+        <div class="session-card">
+            <div class="session-header">
+                <h2>{{ session.descent_type.name }}</h2>
+                <div class="session-meta">
+                    <span><i class="fas fa-clock"></i> {{ session.started_at|date:"F j, Y" }} </span>
+                    {% if session.completed_at and session.entries.exists %}
+                        <span class="text-success"><i class="fas fa-check"></i> Completed</span>
+                        <span><i class="fas fa-clock"></i> Duration: {{ session.completed_at|timesince:session.started_at }}</span>
+                    {% else %}
+                        <span class="text-warning"><i class="fas fa-circle"></i> In Progress</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="session-content">
+                <div class="session-actions">
+                    {% if not session.completed_at or not session.entries.exists %}
+                    <a href="{% url 'journal:session_continue' pk=session.pk %}" class="btn btn-success">
+                        <i class="fas fa-play"></i> Start Over
+                    </a>
+                    {% endif %}
+                </div>
+                    <a href="{% url 'journal:session_detail' pk=session.pk %}" class="btn btn-primary">
+                        <i class="fas fa-eye"></i> View Details
+                    </a>
+
+                    <a href="{% url 'journal:edit_session' session.pk %}" class="btn btn-primary">
+                        <i class="fas fa-edit"></i> Edit Session
+                    </a>
+
+                    <a href="{% url 'journal:session_delete' pk=session.pk %}" class="btn btn-primary">
+                        <i class="fas fa-trash "></i> Delete
+                    </a>
+                    
+            
+
+                <div class="session-entries">
+                    <h3>Latest Entry</h3>
+                    {% with session.entries.first as latest_entry %}
+                    {% if latest_entry %}
+                     <div class="entry-preview">
+                        <div class="entry-header">
+                            <span class="emotion-level">
+                               <i class="fas fa-circle" style="color: {% cycle 'red' 'orange' 'yellow' 'green' 'blue' %};"></i>
+                               Emotion Level: {{ latest_entry.emotion_level}}
+                            </span>
+                        </div>
+                        <div class="entry-content">
+                            {{ latest_entry.content|truncatewords:30|linebreaks }}
+                        </div>
+                        {% if latest_entry.reflection %}
+                        <div class="entry-reflection">
+                           <h4>Reflection:</h4>
+                           <p>{{ latest_entry.reflection|truncatewords:20|linebreaks }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <p> No entries yet</p>
+                    {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+        </div>  
+        {% endfor %}      
+    </div>
+    {% else %}
+    <p class="no-sessions">No Descent sessions found in your history.</p>
+    {% endif %}
+</div>
+{% endblock %}

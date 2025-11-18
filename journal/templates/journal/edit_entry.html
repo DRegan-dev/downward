@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="edit-entry">
+    <h2>Edit Entry</h2>
+    <form action="" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="content">Content</label>
+            <textarea name="content" id="content" rows="4" required>{{ entry.content }}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="emotion_level" id="emotion_level" class="form-control"></label>
+            <select name="emotion_level" id="emotion_level" class="form-control" required>
+                <option value="">Select emotion level</option>
+                {% for level in emotion_levels %}
+                    <option value="{{ level }}" {% if level == entry.emotion_level %}selected{% endif %}>
+                        {% if level == 1 %}Very Low
+                        {% elif  level == 2 %}Low
+                        {% elif level == 3 %}Neutral
+                        {% elif level == 4 %}High
+                        {% else %}Very High
+                        {% endif %}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="reflection">Reflection (optional)</label>
+            <textarea name="reflection" id="reflection" class="form-control" rows="4">{{ entry.reflection|default:'' }}</textarea>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="">
+                <i class="fas fa-save"></i> Save Changes
+            </button>
+            <a href="{% url 'journal:continue_descent' pk=entry.session.pk %}" class="btn btn secondary">
+                <i class="fas fa-times"></i> Cancel
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

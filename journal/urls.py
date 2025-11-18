@@ -1,0 +1,37 @@
+from django.urls import path
+from . import views
+
+app_name = 'journal'
+
+urlpatterns = [
+    # Main pages
+    path('', views.home, name='home'),
+    path('about/', views.about, name='about'),
+    path('privacy/', views.privacy, name='privacy'),
+    path('terms/', views.terms, name='terms'),
+
+    # Descent functionality
+    path('start/', views.start_descent, name='start_descent'),
+    path('continue/<int:pk>/', views.continue_descent, name='continue_descent'),
+    path('abandon/<int:pk>/', views.abandon_descent, name='abandon_descent'),
+    path('complete/<int:pk>/', views.complete_descent, name='complete_descent'),
+    path('history/', views.journal_history, name='journal_history'),
+
+    # Admin functionality
+    path('dashboard/', views.admin_dashboard, name='admin_dashboard'),
+
+    # Descent Type Management
+    path('dashboard/descent-type/', views.descent_type_list, name='descent_type_list'),
+    path('dashboard/descent-type/add/', views.descent_type_add, name='descent_type_add'),
+    path('dashboard/descent-type/<int:pk>/edit/', views.descent_type_edit, name='descent_type_edit'),
+    path('dashboard/descent-type/<int:pk>/delete/', views.descent_type_delete, name='descent_type_delete'),
+
+    # Session functionality
+    path('session/<int:pk>/', views.session_detail, name='session_detail'),
+    path('edit-session/<int:pk>/', views.edit_session, name='edit_session'),
+    path('session/<int:pk>/delete/', views.session_delete, name='session_delete'),  
+    path('session/<int:pk>/continue/', views.continue_descent, name='session_continue'),
+    path('session/<int:pk>/add_entry/', views.add_entry, name='add_entry'),
+    path('entry/<int:entry_id>/edit/', views.edit_entry, name='edit_entry'),
+    path('entry/<int:entry_id>/delete/', views.delete_entry, name='delete_entry'),
+]

@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="session_detail">
+    <h1>Descent Session: {{ session.descent_type.name }}</h1>
+
+    <div class="session-info">
+        <p><i class="fas fa-clock"></i> Started: {{ session.started_at }}</p>
+        {% if session.completed_at %}
+            <p><i class="fas fa-check"></i> Completed: {{ session.completed_at }}</p>
+            <p><i class="fas fa-clock"></i> Duration: {{ session.completed_at|timesince:session.started_at }}</p>
+        {% endif %}
+    </div>
+
+    <div class="entries">
+        <h2>Session Entries</h2>
+        {% for entry in entries %}
+        <div class="entry-card">
+            <div class="entry-header">
+                <span class="emotion-level">
+                    <i class="fas fa-circle"
+                        style="color: {% cycle 'red' 'orange' 'yellow' 'green' 'blue' %};"></i>
+                    Emotion Level: {{ entry.emotion_level }}
+                </span>
+                <span class="entry-date">{{ entry.created_at|date:"F j, Y" }}</span>
+            </div>
+            <div class="entry-content">
+                {{ entry.content|linebreaks }}
+        </div>
+            {% if entry.reflection %}
+            <div class="entry-reflection">
+                <h4>Reflection:</h4>
+                <p>{{ entry.reflection|linebreaks }}</p>
+            </div>
+            {% endif %}
+        </div>
+        {% empty %}
+        <p>No entries have been added to this session yet.</p>
+        {% endfor %}
+    </div>
+
+    <div class="session-actions">
+        {% if not session.completed %}
+        <form action="{% url 'journal:session_detail' pk=session.pk %}" method="post" style="display: inline;">
+            {% csrf_token %}
+            <a href="{% url 'journal:continue_descent' session.pk %}" class="action-button delete">
+                <i class="fas fa-arrow-left"></i> Start Over
+            </a>
+            <button type="submit" name="complete_session" value="1" class="action-button">
+                <i class="fas fa-save"></i> Complete Session
+            </button>
+        </form>
+        {% else %}
+        <a href="{% url 'journal:edit_session' session.pk %}" class="action-button delete">
+            <i class="fas fa-edit"></i> Edit Session
+        </a>
+        {% endif %}
+        <a href="{% url 'journal:journal_history' %}" class="action-button delete">
+            <i class="fas fa-arrow-left"></i> Back to History
+        </a>
+        <a href="{% url 'journal:session_delete' session.pk %}" class="action-button delete">
+            <i class="fas fa-trash"></i> Delete Session
+        </a>
+    </div>
+</div>
+{% endblock %}
