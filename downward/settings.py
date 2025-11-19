@@ -29,7 +29,6 @@ if not SECRET_KEY:
     raise ValueError("No SECRET_KEY set for Django. Please set the SECRET_KEY environment variable.")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 DEBUG = False
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '.devtunnels.ms', 'down-ward-ad9d86ecbdd0.herokuapp.com']
 
@@ -82,12 +81,6 @@ WSGI_APPLICATION = 'downward.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
 
 if 'DATABASE_URL' in os.environ:
     DATABASES = {
