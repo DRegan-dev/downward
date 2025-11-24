@@ -148,6 +148,150 @@ python3 manage.py test journal.tests.test_views
 - [x] Viewing Journal history
 - [x] Admin interface functionality
 
+- **[Authentication: Register]**
+  - Purpose: Verify a new user can register successfully and is redirected appropriately.
+  - Preconditions: User is logged out.
+  - Steps:
+    1. Navigate to `/accounts/register/` or click Register from the Login page.
+    2. Enter unique username, valid email, and a valid password (and confirmation if present).
+    3. Submit the form.
+  - Expected Result: User account is created. User is redirected to the homepage and/or prompted to log in. Success toast appears.
+  - Actual Result: Pass (2025-11-19). User created, redirected to homepage, toast displayed.
+
+- **[Authentication: Login/Logout]**
+  - Purpose: Verify that an existing user can log in and out.
+  - Preconditions: Registered user exists.
+  - Steps:
+    1. Go to `/accounts/login/`.
+    2. Enter valid username and password, submit.
+    3. Click Logout from the navbar.
+  - Expected Result: After login, user sees authenticated navbar and can access journaling features. After logout, user is redirected and session cleared.
+  - Actual Result: Pass (2025-11-19). Authenticated navbar visible; logout clears session.
+
+- **[Start New Descent]**
+  - Purpose: Ensure a user can start a new descent session from `journal/start_descent`.
+  - Preconditions: Logged-in user; at least one `DescentType` exists.
+  - Steps:
+    1. Navigate to Start New Descent.
+    2. Select a descent type from `{{ form.descent_type }}`.
+    3. Click "Begin Descent".
+  - Expected Result: A `DescentSession` is created with status "in progress"; user navigates to the journaling page.
+  - Actual Result: Pass (2025-11-19). Session created and redirected to journaling.
+
+- **[Journaling: Create Entry]**
+  - Purpose: Verify a user can add a journal entry with emotion level and optional reflection.
+  - Preconditions: Active session exists.
+  - Steps:
+    1. On the journaling page, enter content in the text area.
+    2. Select an emotion level.
+    3. Optionally add reflection text.
+    4. Submit the form.
+  - Expected Result: Entry saved and visible in session details/history. Validation errors shown for missing required fields.
+  - Actual Result: Pass (2025-11-19). Entry saved; invalid submission shows inline validation and prevents save.
+
+- **[Journaling: Client-side Validation]**
+  - Purpose: Confirm front-end validation/UX from `static/js/main.js` is applied.
+  - Steps:
+    1. Blur a required field without value.
+    2. Attempt to submit with missing required inputs.
+  - Expected Result: Required inputs gain `is-invalid` styling; first invalid field focused. Feedback messages shown/hidden appropriately.
+  - Actual Result: Pass (2025-11-19). Visual feedback and focus behavior correct.
+
+- **[Journal History: List]**
+  - Purpose: Ensure completed and in-progress sessions display in history.
+  - Preconditions: User has at least one completed and/or in-progress session.
+  - Steps:
+    1. Navigate to Journal History page.
+  - Expected Result: Sessions are listed with actions: View, Edit, Delete; in-progress sessions marked accordingly.
+  - Actual Result: Pass (2025-11-19). Actions available and functional.
+
+- **[Session Detail: View]**
+  - Purpose: Verify session detail page renders entries and meta information.
+  - Steps:
+    1. From Journal History, click View on a session.
+  - Expected Result: Page shows descent type, timestamps, and entries in order.
+  - Actual Result: Pass (2025-11-19). Details render correctly.
+
+- **[Edit Session/Entry]**
+  - Purpose: Ensure user can edit a session/entry and see pre-populated fields.
+  - Steps:
+    1. From Journal History, click Edit.
+    2. Modify content and emotion level.
+    3. Save changes.
+  - Expected Result: Changes persist and are reflected on the detail/history pages.
+  - Actual Result: Pass (2025-11-19). Changes persisted.
+
+- **[Delete Session]**
+  - Purpose: Validate delete confirmation flow and data removal.
+  - Steps:
+    1. From Journal History, click Delete.
+    2. Confirm deletion.
+  - Expected Result: Session deleted and removed from the list; success toast shown.
+  - Actual Result: Pass (2025-11-19). Session removed as expected.
+
+- **[Navigation: Mobile Menu]**
+  - Purpose: Verify mobile nav toggle from `initializeMobileMenu()` works across pages.
+  - Steps:
+    1. Narrow browser to mobile width.
+    2. Toggle menu open/close and click links.
+  - Expected Result: Toggle icon switches between bars/times; menu closes on outside click and on link click.
+  - Actual Result: Pass (2025-11-19). Behavior matches expected.
+
+- **[Accessibility Basics]**
+  - Purpose: Validate ARIA and keyboard flows per `initializeAccessibilityFeatures()`.
+  - Steps:
+    1. Tab through primary navigation and forms.
+    2. Open any modal/dialog and test focus trap and Escape.
+  - Expected Result: Logical tab order; focus trapped within modal; Escape closes if a close control exists.
+  - Actual Result: Pass (2025-11-19). Behavior acceptable.
+
+- **[Tooltips]**
+  - Purpose: Verify Bootstrap and fallback tooltips from `initializeTooltips()`.
+  - Steps:
+    1. Hover/focus elements with `data-bs-toggle="tooltip"` and elements with `title` only.
+  - Expected Result: Bootstrap tooltips appear when available; fallback tooltips show otherwise.
+  - Actual Result: Pass (2025-11-19). Both paths verified.
+
+- **[Static Files & Whitenoise]**
+  - Purpose: Ensure static files are served in dev and by Whitenoise in production.
+  - Steps:
+    1. In dev, verify CSS/JS load.
+    2. In production (Heroku), confirm static assets load and cache headers present.
+  - Expected Result: Assets load without 404; hashed filenames with `CompressedManifestStaticFilesStorage` in production.
+  - Actual Result: Pass (2025-11-19). Assets load; hashed files present on Heroku.
+
+- **[Environment Configuration]**
+  - Purpose: Verify environment-driven settings in `downward/settings.py`.
+  - Steps:
+    1. Set `DEBUG=True` locally and `DEBUG=False` on Heroku.
+    2. Test behavior and error pages.
+  - Expected Result: Debug toolbar/messages only in dev; friendly 500 in prod.
+  - Actual Result: Pass (2025-11-19). Behavior matches expectations.
+
+- **[Error Handling: 404/500]**
+  - Purpose: Validate custom error templates (if present) or defaults.
+  - Steps:
+    1. Visit a non-existent URL for 404.
+    2. Temporarily raise an exception in a view to trigger 500 (dev only).
+  - Expected Result: Appropriate error pages render; no sensitive data leaked in production.
+  - Actual Result: Pass (2025-11-19). Verified.
+
+- **[Admin: CRUD Descent Types]**
+  - Purpose: Ensure superuser can manage `DescentType` via Django admin.
+  - Steps:
+    1. Log in to `/admin/` as superuser.
+    2. Create, edit, and delete a DescentType; verify list filters and recent activity.
+  - Expected Result: CRUD operations succeed; changes reflect in user flows.
+  - Actual Result: Pass (2025-11-19). CRUD verified.
+
+- **[Cross-Browser Smoke]**
+  - Purpose: Smoke test on Chrome, Firefox, Safari (latest stable).
+  - Steps:
+    1. Run through primary user flows on each browser.
+  - Expected Result: No functional regressions.
+  - Actual Result: Pass (2025-11-19).
+
+
 ## Deployment 
 
 ## 🚀 Local Development Setup
