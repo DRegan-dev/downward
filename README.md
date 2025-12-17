@@ -20,6 +20,22 @@ A Provide space for exploring emotional descents and personal reflections. Downw
 - **Authentication**: Django Auth
 - **Icons**: Font Awesome
 
+## Design Decisions
+- Typography
+  - Primary: 'Bebas Neue', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif
+  - Rationale: 'Bebas Neue' provides a bold, distinctive voice for headings and overall brand feel; 'Inter' and system fallbacks ensure legible rendering across devices with consistent        metrics and broad OS coverage.
+  - Implementation: The stack is defined as a CSS variable `--font-primary` in [static/css/base.css]
+- Color Palette
+  - Primary: #0D6EFD (actions), Secondary: #6C757D (muted), Background: #FFFFFF, Text: #212529
+  - Accessibility: All primary text/background combinations meet WCAG AA (contrast ≥ 4.5:1).
+- Navigation & Flow
+  - Clear CTA on homepage (“Begin your Descent”) leading to Start Descent.
+  - Auth gates redirect unauthenticated users to login/register.
+  - Post-actions provide toasts and clear routes back to history/details.
+- Accessibility
+  - Keyboard focus management for dialogs; ARIA `aria-live="polite"` on main content.
+  - Button/icon labels with descriptive titles; tooltip fallbacks for non-Bootstrap contexts.
+
 ## Getting Started
 
 ### Home page
